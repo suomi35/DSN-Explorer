@@ -23,6 +23,7 @@ data class CustomColorPalette(
     val backgroundNoSignalHeader: Color = Color.Unspecified,
     val backgroundNoSignalContainer: Color = Color.Unspecified,
     val inactiveDishText: Color = Color.Unspecified,
+    val noSpacecraftFound: Color = Color.Unspecified,
 )
 
 val LightCustomColorPalette = CustomColorPalette(
@@ -43,6 +44,7 @@ val LightCustomColorPalette = CustomColorPalette(
     backgroundNoSignalHeader = Color(0xff745757),
     backgroundNoSignalContainer = Color(0xff8a5a5a),
     inactiveDishText = Color(0xff4f5153),
+    noSpacecraftFound = Color(0xff4f5153),
 )
 
 val DarkCustomColorPalette = CustomColorPalette(
@@ -63,6 +65,7 @@ val DarkCustomColorPalette = CustomColorPalette(
     backgroundNoSignalHeader = Color(0xff745757),
     backgroundNoSignalContainer = Color(0xff8a5a5a),
     inactiveDishText = Color(0xff4f5153),
+    noSpacecraftFound = Color(0xffbbbbbb),
 )
 
 val LocalCustomColorPalette = staticCompositionLocalOf { CustomColorPalette() }

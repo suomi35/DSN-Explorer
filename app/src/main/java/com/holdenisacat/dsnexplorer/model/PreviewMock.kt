@@ -21,6 +21,10 @@ object PreviewMock {
         return targets
     }
 
+    fun noTargets(): ArrayList<Target> {
+        return ArrayList()
+    }
+
     fun dish(isActive: Boolean = true): Dish {
         return Dish(
             name = "DSS53",
