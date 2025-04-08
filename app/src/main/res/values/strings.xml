@@ -1,0 +1,51 @@
+<resources>
+    <string name="app_name">DSN Explorer</string>
+    <string name="spacecraft_detail_antenna_name">Antenna: %1$s</string>
+    <string name="spacecraft_detail_antenna_windspeed">Wind Speed: %1$s km/hr</string>
+    <string name="spacecraft_detail_antenna_azimuth">Azimuth: %1$s°</string>
+    <string name="spacecraft_detail_antenna_elevation">Elevation: %1$s°</string>
+    <string name="active_dish_windspeed">WS: %1$s km/hr</string>
+    <string name="active_dish_azimuth">AZ: %1$s°</string>
+    <string name="active_dish_elevation">EL: %1$s°</string>
+    <string name="active_dish_activity">Activity: %1$s</string>
+    <string name="signal_detail_type">%1$s %2$s</string>
+    <string name="signal_detail_uplink">Uplink</string>
+    <string name="signal_detail_downlink">Downlink</string>
+    <string name="signal_detail_frequency">Frequency: %1$s</string>
+    <string name="signal_detail_data_rate">Data Rate: %1$s</string>
+    <string name="signal_detail_transmitted">Power Transmitted: %1$s</string>
+    <string name="signal_detail_received">Power Received: %1$s</string>
+    <string name="signal_info_title">Signal Information</string>
+    <string name="signal_info_okay_button">Okay</string>
+    <string name="signal_detail_uplink_data_text">&lt;b&gt;Uplink&lt;/b&gt; is used to send commands \'up\' to a spacecraft.&lt;br&gt;&lt;br&gt;&lt;b&gt;Data&lt;/b&gt; signals are used for commands, scientific measurements, or housekeeping engineering information.</string>
+    <string name="signal_detail_downlink_data_text">&lt;b&gt;Downlink&lt;/b&gt; is data received from a spacecraft.&lt;br&gt;&lt;br&gt;&lt;b&gt;Data&lt;/b&gt; signals are used for commands, scientific measurements, or housekeeping engineering information.</string>
+    <string name="signal_detail_uplink_carrier_text">&lt;b&gt;Uplink&lt;/b&gt; is used to send commands \'up\' to a spacecraft.&lt;br&gt;&lt;br&gt;&lt;b&gt;Carrier&lt;/b&gt; signals are pure radio \'tones\' used to establish communications, or for navigation.</string>
+    <string name="signal_detail_downlink_carrier_text">&lt;b&gt;Downlink&lt;/b&gt; is data received from a spacecraft.&lt;br&gt;&lt;br&gt;&lt;b&gt;Carrier&lt;/b&gt; signals are pure radio \'tones\' used to establish communications, or for navigation.</string>
+    <string name="no_signal_text">No Signal\nSetup / Teardown / Tracking</string>
+    <string name="no_dishes_text">No currently active dishes</string>
+
+    <string name="roundtrip_light_time">RTLT: %1$s</string>
+    <string name="range">Range: %1$s</string>
+    <string name="mode">Mode: %1$s</string>
+    <string name="band">Band: %1$s</string>
+
+    <string name="legend">Legend</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+
+    <string name="action_settings">Settings</string>
+
+    <string name="what_is_ddor">ΔDOR</string>
+    <string name="ddor_text">&lt;b&gt;Delta-Differential One-Way Ranging&lt;/b&gt; (or Delta-DOR, ΔDOR for short) is an interplanetary radio-tracking and navigation technique.&lt;br&gt;&lt;br&gt;Radio signals from a spacecraft are received by two widely separated deep-space ground stations on earth and the difference in the times of signal arrival is precisely measured and used to calculate a bearing. This is corrected using information about the current delays due to Earth\’s atmosphere, obtained by simultaneously tracking radio signals from a quasar within 10 degrees of the same direction from each ground location. NASA uses its Deep Space Network to pick up signals from spacecraft that tell navigators where the spacecraft are located. This navigation service is called \"tracking coverage\" and it includes Doppler, ranging and delta differential one-way ranging, or \"Delta DOR.\"</string>
+    <string name="what_is_mspa">MSPA</string>
+    <string name="mspa_text">The Deep Space Network (DSN) communicates with nearly all spacecraft flying throughout our solar system. Many spacecraft are cruising in space, observing Saturn, the sun, asteroids and comets. In addition, the Mars Exploration Rovers are still busy on the surface of Mars and NASA\'s Mars Reconnaissance Orbiter has joined the other Martian orbiters. DSN antennas are extremely busy trying to track all of these space missions at once. The Mars Science Laboratory spacecraft must therefore share time on the DSN antennas. A sophisticated scheduling system with a team of hundreds of negotiators around the world ensures that each mission\'s priorities are met.&lt;br&gt;&lt;br&gt;During critical mission events, such as landing on Mars, multiple antennas on Earth and the Mars Reconnaissance Orbiter track the signals from the spacecraft to minimize risk of loss of communication. During the landed operations phase on the Martian surface, the Mars Science Laboratory utilizes the &lt;b&gt;Multiple Spacecraft Per Aperture&lt;/b&gt; (MSPA) capability of the DSN, which allows a single DSN antenna to receive downlink from up to four spacecraft simultaneously, as well as using the relay capabilities of the Mars Odyssey (ODY) and Mars Reconnaissance Orbiter (MRO) spacecraft.&lt;br&gt;&lt;br&gt;The rover\'s downlink sessions (when the rover sends information back to Earth) are generally roughly 15 minutes each, with usually two downlink sessions per relay orbiter (ODY, MRO) per Martian day (sol), with two sessions overnight and two sessions in the late Martian afternoon. MSPA allows only one spacecraft at a time to have the uplink, and Curiosity commands early in each sol (Martian day) for roughly 30 minutes to provide the instructions for that sol\'s activities.</string>
+    <string name="what_is_array">Antenna Arraying</string>
+    <string name="array_text">Antenna arraying combines the signals received by multiple antennas at different locations to function as a single large antenna.&lt;br&gt;&lt;br&gt;Arraying is commonly used to improve reception of weak signals. The technique is beneficial in deep space communications where the signal transmitted by a spacecraft becomes very weak as it travels across vast interplanetary distances.When a spacecraft\'s signal reaches Earth, it is spread over a wide area, so a single antenna only intercepts a small part of it. Arraying allows more of the weak signal to be captured and enables higher data rates.&lt;br&gt;&lt;br&gt;&lt;b&gt;Early arrays&lt;/b&gt;&lt;br&gt;&lt;br&gt;The Deep Space Network first used arraying for missions in the early 1970s. Experiments with a prototype arraying system for the 1979 Voyager encounters at Jupiter and the Pioneer 11 encounter with Saturn told engineers a great deal about how to gain increased sensitivity. All three DSN complexes then made intensive use of arrayed configurations for the Voyager encounters with Saturn in 1980 and 1981.&lt;br&gt;&lt;br&gt;By the time Voyager 2 flew by Uranus in 1986, the DSN was combining signals from up to four antennas. For the spacecraft\'s Neptune encounter three years later, the DSN combined signals from Australia\'s Parkes Radio Telescope into the Canberra complex, and combined signals from the 27 antennas of the Very Large Array (VLA) in New Mexico into the Goldstone array.&lt;br&gt;&lt;br&gt;&lt;b&gt;A Triumph for Galileo&lt;/b&gt;&lt;br&gt;&lt;br&gt;The Galileo mission to Jupiter employed arraying in 1996 and 1997 to increase the amount of science data that mission, with its crippled high-gain antenna, could return. For Galileo, the DSN arrayed up to five antennas from three tracking facilities on two continents (specifically, Goldstone, Canberra and Parkes).&lt;br&gt;&lt;br&gt;The result for Galileo was improved data return by a factor of three, compared to that of a single 70-meter (230-foot) antenna. Arraying, plus advances in data compression and encoding techniques, helped make Galileo so successful that its mission was extended to more than a dozen years of valuable observations of Jupiter and its moons.</string>
+    <string name="signal_info_close_button">Close</string>
+
+    <string name="dish_inactive">Inactive</string>
+    <string name="dish_size">Dish Size: %1$s</string>
+
+    <string name="spacecraft_image_url">https://eyes.nasa.gov/apps/dsn-now/images/spacecraft/%1$s.jpg</string>
+</resources>
