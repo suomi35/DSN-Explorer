@@ -8,7 +8,6 @@ import com.holdenisacat.dsnexplorer.model.Signal
 import com.holdenisacat.dsnexplorer.model.SignalDirection
 import com.holdenisacat.dsnexplorer.model.Site
 import com.holdenisacat.dsnexplorer.model.Spacecraft
-import com.holdenisacat.dsnexplorer.model.Target
 import com.holdenisacat.dsnexplorer.util.Constants
 import org.xmlpull.v1.XmlPullParser
 import org.xmlpull.v1.XmlPullParserException
@@ -22,7 +21,7 @@ class DataXmlPullParserHandler {
     private var sites: ArrayList<Site> = ArrayList()
     private var dishes: ArrayList<Dish> = ArrayList()
     private var signals: ArrayList<Signal> = ArrayList()
-    private var targets: ArrayList<Target> = ArrayList()
+    private var spacecraftList: ArrayList<Spacecraft> = ArrayList()
     private lateinit var dish: Dish
     private lateinit var site: Site
     private var isOrphanDish = false
@@ -78,7 +77,7 @@ class DataXmlPullParserHandler {
 
 //                            // init arrays for dish
                             signals = ArrayList()
-                            targets = ArrayList()
+                            spacecraftList = ArrayList()
                         }
                     } else if (tagname.equals(Constants.UP_SIGNAL, ignoreCase = true)) {
                         signals.add(
@@ -129,23 +128,17 @@ class DataXmlPullParserHandler {
                         )
                         if (spacecraft.name != Constants.UFO
                             && spacecraft.name != Constants.DSN) {
-                            Timber.tag(TAG).d("enhancing spacecraft: ${spacecraft.name}")
-                            targets.add(
-                                Target(
-                                    parser.getAttributeValue(null, Constants.NAME),
-                                    parser.getAttributeValue(null, Constants.ID),
-                                    parser.getAttributeValue(null, Constants.UPLEG_RANGE)
-                                        .toFloat(),
-                                    parser.getAttributeValue(null, Constants.DOWNLEG_RANGE)
-                                        .toFloat(),
-                                    parser.getAttributeValue(null, Constants.ROUNDTRIP_LIGHT_TIME)
-                                        .toFloat(),
-                                    spacecraft.friendlyName,
-                                    spacecraft.thumbnail
-                                )
-                            )
+                            Timber.tag(TAG).d(">>> enhancing spacecraft: ${spacecraft.name}")
+                            spacecraft.id = parser.getAttributeValue(null, Constants.ID)
+                            spacecraft.uplegRange = parser.getAttributeValue(null,
+                                Constants.UPLEG_RANGE).toFloat()
+                            spacecraft.downlegRange = parser.getAttributeValue(null,
+                                Constants.DOWNLEG_RANGE).toFloat()
+                            spacecraft.roundtripLightTime = parser.getAttributeValue(null,
+                                Constants.ROUNDTRIP_LIGHT_TIME).toFloat()
+                            spacecraftList.add(spacecraft)
                         } else {
-                            Timber.tag(TAG).d("no config entry for: ${parser.getAttributeValue(null, Constants.NAME)}")
+                            Timber.tag(TAG).d(">>> no config entry for: ${parser.getAttributeValue(null, Constants.NAME)}")
 //                            targets.add(
 //                                Target(
 //                                    parser.getAttributeValue(null, Constants.NAME),
@@ -170,7 +163,7 @@ class DataXmlPullParserHandler {
                     } else if (tagname.equals(Constants.DISH, ignoreCase = true)) {
                         if (!isOrphanDish) {
                             dish.signals = signals
-                            dish.targets = targets
+                            dish.spacecraftList = spacecraftList
                         } else {
                             isOrphanDish = false
                         }

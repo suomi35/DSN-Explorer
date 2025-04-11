@@ -9,12 +9,9 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.requiredWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Card
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -28,23 +25,23 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.holdenisacat.dsnexplorer.R
 import com.holdenisacat.dsnexplorer.model.PreviewMock
-import com.holdenisacat.dsnexplorer.model.Target
+import com.holdenisacat.dsnexplorer.model.Spacecraft
 import com.holdenisacat.dsnexplorer.ui.theme.LocalCustomColorPalette
 import com.holdenisacat.dsnexplorer.util.Utils
 
 @Composable
 fun SpacecraftListView(
-    targets: ArrayList<Target>,
-    onTargetClick: (Target) -> Unit,
+    spacecraftList: ArrayList<Spacecraft>,
+    onSpacecraftClick: (Spacecraft) -> Unit,
 ) {
     // this could be enhanced with ElevatedCard/OutlinedCard/FilledCard
-    when (targets.size > 0) {
+    when (spacecraftList.size > 0) {
         true -> {
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
     ) {
-                items(targets) { target ->
+                items(spacecraftList) { spacecraft ->
                     Card(
                         modifier = Modifier
                             .padding(4.dp)
@@ -61,15 +58,15 @@ fun SpacecraftListView(
                                         .weight(1f)
                                         .padding(2.dp)
                                         .clickable {
-                                            onTargetClick(target)
+                                            onSpacecraftClick(spacecraft)
                                         },
-                                    text = target.friendlyName,
+                                    text = spacecraft.friendlyName,
                                     fontSize = 18.sp
                                 )
                                 Image(
                                     modifier = Modifier
                                         .align(Alignment.CenterVertically),
-                                    painter = painterResource(id = target.flag),
+                                    painter = painterResource(id = spacecraft.flag),
                                     contentDescription = "target-observing antenna country flag image"
                                 )
                             }
@@ -83,7 +80,7 @@ fun SpacecraftListView(
                                         .align(Alignment.CenterVertically),
                                     text = stringResource(
                                         R.string.range,
-                                        Utils.distanceToString(target.uplegRange)
+                                        Utils.distanceToString(spacecraft.uplegRange)
                                     )
                                 )
                                 Text(
@@ -94,7 +91,7 @@ fun SpacecraftListView(
                                     textAlign = TextAlign.End,
                                     text = stringResource(
                                         R.string.roundtrip_light_time,
-                                        Utils.lightTimeToString(target.roundtripLightTime)
+                                        Utils.lightTimeToString(spacecraft.roundtripLightTime)
                                     )
                                 )
                             }
@@ -133,7 +130,7 @@ fun SpacecraftListView(
 @Composable
 fun SpacecraftListViewPreview() {
     SpacecraftListView(
-        PreviewMock.targets(),
-        onTargetClick = {}
+        PreviewMock.spacecraftList(),
+        onSpacecraftClick = {}
     )
 }

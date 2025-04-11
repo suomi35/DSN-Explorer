@@ -37,15 +37,14 @@ import coil3.compose.AsyncImage
 import com.holdenisacat.dsnexplorer.R
 import com.holdenisacat.dsnexplorer.model.Dish
 import com.holdenisacat.dsnexplorer.model.PreviewMock
-import com.holdenisacat.dsnexplorer.model.Target
-import com.holdenisacat.dsnexplorer.ui.theme.LocalCustomColorPalette
+import com.holdenisacat.dsnexplorer.model.Spacecraft
 import com.holdenisacat.dsnexplorer.util.Utils
 import java.util.Locale
 
 @Composable
 fun SpacecraftDetailView(
     dish: Dish,
-    target: Target,
+    spacecraft: Spacecraft,
     onDishClick: (Dish) -> Unit,
     onSpacecraftClick: (String) -> Unit,
     onDismissDetailView: () -> Unit,
@@ -63,11 +62,11 @@ fun SpacecraftDetailView(
                     modifier = Modifier
                         .fillMaxWidth()
                         .clickable {
-                            onSpacecraftClick(target.friendlyName)
+                            onSpacecraftClick(spacecraft.friendlyName)
                         },
                     model = stringResource(
                         R.string.spacecraft_image_url,
-                        Uri.encode(target.friendlyName.lowercase(Locale.ROOT))
+                        Uri.encode(spacecraft.friendlyName.lowercase(Locale.ROOT))
                     ),
                     contentDescription = "spacecraft image",
                 )
@@ -82,7 +81,7 @@ fun SpacecraftDetailView(
                     modifier = Modifier
                         .padding(start = 8.dp, bottom = 8.dp)
                         .align(Alignment.BottomStart),
-                    text = target.friendlyName,
+                    text = spacecraft.friendlyName,
                     fontWeight = FontWeight.Bold,
                     color = Color.White,
                     style = TextStyle(
@@ -97,8 +96,8 @@ fun SpacecraftDetailView(
                     painter = painterResource(id = R.drawable.ic_open_in_new),
                     contentDescription = "open icon",
                     modifier = Modifier
-                        .padding(end = 8.dp, bottom = 8.dp)
-                        .align(Alignment.BottomEnd),
+                        .padding(top = 8.dp, end = 8.dp)
+                        .align(Alignment.TopEnd),
                 )
             }
 
@@ -155,9 +154,9 @@ fun SpacecraftDetailView(
                 modifier = Modifier
                     .verticalScroll(scrollState)
             ) {
-                val targetActiveSignals = dish.getTargetActiveSignals(target)
+                val targetActiveSignals = dish.getSpacecraftActiveSignals(spacecraft)
                 when (targetActiveSignals.size > 0) {
-                    true -> dish.getTargetSignals(target).forEach { signal -> SignalView(signal) }
+                    true -> dish.getSpacecraftSignals(spacecraft).forEach { signal -> SignalView(signal) }
                     false -> NoSignalView()
                 }
             }
@@ -171,7 +170,7 @@ fun SpacecraftDetailView(
 fun SpacecraftDetailViewPreview() {
     SpacecraftDetailView(
         PreviewMock.dish(),
-        PreviewMock.target(),
+        PreviewMock.spacecraft(),
         onDishClick = {},
         onDismissDetailView = {},
         onSpacecraftClick = {}

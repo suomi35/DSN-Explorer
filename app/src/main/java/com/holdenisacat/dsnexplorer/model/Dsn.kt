@@ -9,39 +9,39 @@ data class Dsn(
 ) {
     constructor() : this(ArrayList<Site>())
 
-    fun getAllActiveTargets(sortAlpha: Boolean, ignoreUFOs: Boolean = true): ArrayList<Target> {
-        val targets = java.util.ArrayList<Target>()
+    fun getAllActiveSpacecraft(sortAlpha: Boolean, ignoreUFOs: Boolean = true): ArrayList<Spacecraft> {
+        val spacecraftList = java.util.ArrayList<Spacecraft>()
         for (site in sites) {
             for (dish in site.dishes) {
-                for (target in dish.targets) {
-                    var addTargetToList = true
-                    for (existingTarget in targets) {
-                        if (existingTarget.name == target.name
-                            || (ignoreUFOs && target.name == Constants.UFO)) {
-                            addTargetToList = false
+                for (spacecraft in dish.spacecraftList) {
+                    var addSpacecraftToList = true
+                    for (existingSpacecraft in spacecraftList) {
+                        if (existingSpacecraft.name == spacecraft.name
+                            || (ignoreUFOs && spacecraft.name == Constants.UFO)) {
+                            addSpacecraftToList = false
                             break
                         }
                     }
-                    if (addTargetToList) {
-                        target.flag = Utils.getSiteFlag(site.name)
-                        targets.add(target)
+                    if (addSpacecraftToList) {
+                        spacecraft.flag = Utils.getSiteFlag(site.name)
+                        spacecraftList.add(spacecraft)
                     }
                 }
             }
         }
         if (sortAlpha) {
-            targets.sortedWith(compareByDescending { it.friendlyName })
+            spacecraftList.sortedWith(compareByDescending { it.friendlyName })
         }
-        return targets
+        return spacecraftList
     }
 
-    fun getAllDishesForTarget(target: Target): LinkedHashSet<Dish> {
+    fun getAllDishesForSpacecraft(spacecraft: Spacecraft): LinkedHashSet<Dish> {
         val dishList = LinkedHashSet<Dish>()
         for (site in sites) {
             for (dish in site.dishes) {
                 if (dish.signals.isNotEmpty()) {
                     for (signal in dish.signals) {
-                        if (target.id == signal.spacecraftId) {
+                        if (spacecraft.id == signal.spacecraftId) {
                             dishList.add(dish)
                         }
                     }

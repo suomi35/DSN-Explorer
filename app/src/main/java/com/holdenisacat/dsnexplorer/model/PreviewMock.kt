@@ -14,14 +14,16 @@ object PreviewMock {
         return signals
     }
 
-    fun targets(): ArrayList<Target> {
-        val targets = ArrayList<Target>()
-        targets.add(Target("M01O", "53", 173000000F, 173000000F, 1190F, "Mars Odyssey", false, R.drawable.flag_mdscc))
-        targets.add(Target("MVN", "202", 173000000F, 173000000F, 4160F, "MAVEN", false, R.drawable.flag_cdscc))
-        return targets
+    fun spacecraftList(): ArrayList<Spacecraft> {
+        val spacecraftList = ArrayList<Spacecraft>()
+        spacecraftList.add(Spacecraft("M01O", "53", "Mars Odyssey", false, "", 173000000F,
+            173000000F, 1190F, R.drawable.flag_mdscc))
+        spacecraftList.add(Spacecraft("MVN", "202", "MAVEN", false, "", 173000000F, 173000000F,
+            4160F, R.drawable.flag_cdscc))
+        return spacecraftList
     }
 
-    fun noTargets(): ArrayList<Target> {
+    fun noSpacecraft(): ArrayList<Spacecraft> {
         return ArrayList()
     }
 
@@ -40,19 +42,21 @@ object PreviewMock {
             isActive = isActive, // set by us during parsing
             dishLocation = "mdscc", // set to `site.name` during parsing
             signals = signals(),
-            targets = targets()
+            spacecraftList = spacecraftList(),
         )
     }
 
-    fun target(): Target {
-        return Target(
+    fun spacecraft(): Spacecraft {
+        return Spacecraft(
             "M01O",
             "53",
+            "Mars Odyssey",
+            false,
+            "",
             173000000F,
             173000000F,
             1190F,
-            "Mars Odyssey",
-            false
+            R.drawable.flag_mdscc_128
         )
     }
 

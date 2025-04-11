@@ -1,16 +1,12 @@
 package com.holdenisacat.dsnexplorer.view
 
-import android.net.Uri
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -40,17 +36,16 @@ import com.holdenisacat.dsnexplorer.R
 import com.holdenisacat.dsnexplorer.model.Dish
 import com.holdenisacat.dsnexplorer.model.PreviewMock
 import com.holdenisacat.dsnexplorer.model.SignalDirection
-import com.holdenisacat.dsnexplorer.model.Target
+import com.holdenisacat.dsnexplorer.model.Spacecraft
 import com.holdenisacat.dsnexplorer.ui.component.AnimatedVectorDrawable
 import com.holdenisacat.dsnexplorer.util.Constants
 import com.holdenisacat.dsnexplorer.util.Utils
-import java.util.Locale
 
 @Composable
 fun DishDetailView(
     dish: Dish,
     onDishClick: (Dish) -> Unit,
-    onSpacecraftClick: (Target) -> Unit,
+    onSpacecraftClick: (Spacecraft) -> Unit,
     onDismissDetailView: () -> Unit,
     topRowDetailSpacing: Dp = 4.dp,
     horizontalPadding: Dp = 8.dp,
@@ -146,12 +141,12 @@ fun DishDetailView(
                     modifier = Modifier
                         .verticalScroll(scrollState)
                 ) {
-                    dish.targets.forEach { target ->
+                    dish.spacecraftList.forEach { spacecraft ->
                         Row(
                             modifier = Modifier
                                 .padding(top = 8.dp)
                                 .clickable {
-                                    onSpacecraftClick(target)
+                                    onSpacecraftClick(spacecraft)
                                 }
                         ) {
                             Icon(
@@ -164,12 +159,12 @@ fun DishDetailView(
                             Text(
                                 modifier = Modifier
                                     .padding(4.dp),
-                                text = target.friendlyName,
+                                text = spacecraft.friendlyName,
                                 fontWeight = FontWeight.Bold,
                                 fontSize = 18.sp
                             )
                             Spacer(Modifier.weight(1f))
-                            dish.getTargetSignalsByDirection(target, SignalDirection.UP)
+                            dish.getSpacecraftSignalsByDirection(spacecraft, SignalDirection.UP)
                                 .forEach { upSignal ->
                                     when (upSignal.signalType) {
                                         Constants.DATA_SIGNAL -> {
@@ -181,7 +176,7 @@ fun DishDetailView(
                                         }
                                     }
                                 }
-                            dish.getTargetSignalsByDirection(target, SignalDirection.DOWN)
+                            dish.getSpacecraftSignalsByDirection(spacecraft, SignalDirection.DOWN)
                                 .forEach { downSignal ->
                                     when (downSignal.signalType) {
                                         Constants.DATA_SIGNAL -> {
@@ -201,7 +196,7 @@ fun DishDetailView(
                                     .align(Alignment.CenterVertically),
                                 text = stringResource(
                                     R.string.range,
-                                    Utils.distanceToString(target.uplegRange)
+                                    Utils.distanceToString(spacecraft.uplegRange)
                                 )
                             )
                             Text(
@@ -212,7 +207,7 @@ fun DishDetailView(
                                 textAlign = TextAlign.End,
                                 text = stringResource(
                                     R.string.roundtrip_light_time,
-                                    Utils.lightTimeToString(target.roundtripLightTime)
+                                    Utils.lightTimeToString(spacecraft.roundtripLightTime)
                                 )
                             )
                         }

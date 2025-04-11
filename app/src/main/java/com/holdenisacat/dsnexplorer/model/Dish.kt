@@ -21,34 +21,34 @@ data class Dish(
     var isActive: Boolean = false,
     var dishLocation: String = "",
     var signals: ArrayList<Signal> = ArrayList(),
-    var targets: ArrayList<Target> = ArrayList()
+    var spacecraftList: ArrayList<Spacecraft> = ArrayList()
 ) {
     constructor() : this("", "", "")
 
-    fun getTargetSignalsByDirection(target: Target, direction: SignalDirection): ArrayList<Signal> {
+    fun getSpacecraftSignalsByDirection(spacecraft: Spacecraft, direction: SignalDirection): ArrayList<Signal> {
         val matchingSignals: ArrayList<Signal> = ArrayList()
         for (signal in signals) {
-            if (signal.spacecraft == target.name && signal.direction == direction) {
+            if (signal.spacecraft == spacecraft.name && signal.direction == direction) {
                 matchingSignals.add(signal)
             }
         }
         return matchingSignals
     }
 
-    fun getTargetSignals(target: Target): ArrayList<Signal> {
+    fun getSpacecraftSignals(spacecraft: Spacecraft): ArrayList<Signal> {
         val matchingSignals: ArrayList<Signal> = ArrayList()
         for (signal in signals) {
-            if (signal.spacecraft == target.name) {
+            if (signal.spacecraft == spacecraft.name) {
                 matchingSignals.add(signal)
             }
         }
         return matchingSignals
     }
 
-    fun getTargetActiveSignals(target: Target): ArrayList<Signal> {
+    fun getSpacecraftActiveSignals(spacecraft: Spacecraft): ArrayList<Signal> {
         val matchingSignals: ArrayList<Signal> = ArrayList()
         for (signal in signals) {
-            if (signal.spacecraft == target.name && signal.active) {
+            if (signal.spacecraft == spacecraft.name && signal.active) {
                 matchingSignals.add(signal)
             }
         }

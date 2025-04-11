@@ -8,7 +8,7 @@ import androidx.lifecycle.viewModelScope
 import com.holdenisacat.dsnexplorer.model.DataStatus
 import com.holdenisacat.dsnexplorer.model.Dish
 import com.holdenisacat.dsnexplorer.model.Dsn
-import com.holdenisacat.dsnexplorer.model.Target
+import com.holdenisacat.dsnexplorer.model.Spacecraft
 import com.holdenisacat.dsnexplorer.repository.DataRepository
 import com.holdenisacat.dsnexplorer.repository.WorkHandler
 import com.holdenisacat.dsnexplorer.util.DsnExplorerPreferences
@@ -54,9 +54,9 @@ class MainViewModel : ViewModel(), KoinComponent {
     private val _dishDetailFlow = MutableStateFlow(dishDetail)
     val dishDetailFlow: StateFlow<Dish> get() = _dishDetailFlow
 
-    private val spacecraftDetail: Target by mutableStateOf(Target())
+    private val spacecraftDetail: Spacecraft by mutableStateOf(Spacecraft())
     private val _spacecraftDetailFlow = MutableStateFlow(spacecraftDetail)
-    val spacecraftDetailFlow: StateFlow<Target> get() = _spacecraftDetailFlow
+    val spacecraftDetailFlow: StateFlow<Spacecraft> get() = _spacecraftDetailFlow
 
     init {
         println(">>> MainViewModel init() ...")
@@ -112,9 +112,9 @@ class MainViewModel : ViewModel(), KoinComponent {
 //        _currentModeIndex.value = index
     }
 
-    fun triggerSpacecraftDetailView(dish: Dish, target: Target) {
+    fun triggerSpacecraftDetailView(dish: Dish, spacecraft: Spacecraft) {
         _currentDishFlow.value = dish
-        _spacecraftDetailFlow.value = target
+        _spacecraftDetailFlow.value = spacecraft
     }
 
     fun triggerDishDetailView(dish: Dish) {
