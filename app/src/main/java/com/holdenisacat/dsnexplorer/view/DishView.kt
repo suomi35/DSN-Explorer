@@ -37,6 +37,7 @@ import com.holdenisacat.dsnexplorer.util.Utils
 @Composable
 fun DishView(
     dish: Dish,
+    onDishClick: (Dish) -> Unit,
     onSpacecraftClick: (Spacecraft) -> Unit,
     topRowDetailSpacing: Dp = 10.dp,
     dishNameFontSize: TextUnit = 20.sp
@@ -68,7 +69,8 @@ fun DishView(
                             modifier = Modifier
                                 .padding(2.dp)
                                 .weight(1f)
-                                .align(Alignment.CenterVertically),
+                                .align(Alignment.CenterVertically)
+                                .clickable{ onDishClick(dish) },
                             text = dish.friendlyName,
                             fontWeight = FontWeight.Bold,
                             fontSize = dishNameFontSize,
@@ -238,6 +240,7 @@ fun DishView(
 fun DishViewPreview() {
     DishView(
         PreviewMock.dish(isActive = false),
+        onDishClick = {},
         onSpacecraftClick = {}
     )
 }

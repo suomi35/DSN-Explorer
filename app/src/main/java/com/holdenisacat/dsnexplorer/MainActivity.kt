@@ -221,6 +221,10 @@ class MainActivity : ComponentActivity(), KoinComponent {
                                                     items(dsn.sites[lastSiteIndex].getDishes(false)) { dish ->
                                                         DishView(
                                                             dish,
+                                                            onDishClick = {
+                                                                viewModel.triggerDishDetailView(dish)
+                                                                showDishDetailView = true
+                                                            },
                                                             onSpacecraftClick = {
                                                                 viewModel.triggerSpacecraftDetailView(dish, it)
                                                                 showSpacecraftDetailView = true
