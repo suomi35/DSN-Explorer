@@ -1,37 +1,32 @@
 package com.holdenisacat.dsnexplorer.repository
 
 import android.content.Context
-import androidx.work.Worker
+import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+import com.holdenisacat.dsnexplorer.model.DataStatus
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import timber.log.Timber
 
 class DataRepositoryWorker(appContext: Context, workerParams: WorkerParameters) :
-    Worker(appContext, workerParams), KoinComponent {
+    CoroutineWorker(appContext, workerParams), KoinComponent {
 
-    private val dataRepository: DataRepository by inject<DataRepository>()
+    private val dataRepository: DataRepository by inject()
 
-    override fun doWork(): Result {
-        Timber.tag(TAG).i(">>> doWork")
+    override suspend fun doWork(): Result {
+        Timber.tag(TAG).i("Refreshing DSN data")
 
-        //you can notify back to user
         WorkHandler.onDoWork()
 
-        CoroutineScope(Dispatchers.IO).launch {
-            dataRepository.fetchConfig()
+        return when (dataRepository.refresh()) {
+            DataStatus.LOADED -> Result.success()
+            DataStatus.ERROR -> Result.retry()
+            else -> Result.success()
         }
-
-        return Result.success()
     }
 
     companion object {
-        // unique name for the work
         const val WORK_NAME = "MyWorker"
-        private const val TAG = "MyWork"
-
+        private const val TAG = "DataRepositoryWorker"
     }
 }

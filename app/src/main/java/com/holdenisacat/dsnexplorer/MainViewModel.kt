@@ -18,7 +18,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
-import timber.log.Timber
 
 class MainViewModel : ViewModel(), KoinComponent {
 
@@ -59,24 +58,11 @@ class MainViewModel : ViewModel(), KoinComponent {
     val spacecraftDetailFlow: StateFlow<Spacecraft> get() = _spacecraftDetailFlow
 
     init {
-        println(">>> MainViewModel init() ...")
         viewModelScope.launch {
-            dataRepository.configurationFlow.collect {
-                Timber.d(">>> got configuration response")
-                if (it.sites.size > 0) {
-                    _initiallyLoaded.value = dataRepository.fetchDsnData(it)
-                } else {
-                    Timber.d(">>> not fetching DSN as config is empty")
-                }
-            }
-        }
-        viewModelScope.launch {
-            dataRepository.dsnFlow.collect {
-                Timber.d(">>> got DSN response")
-                if (it.sites.size > 0) {
-                    _dsnFlow.value = it
-                } else {
-                    Timber.d(">>> DSN is empty")
+            dataRepository.dsnFlow.collect { dsn ->
+                if (dsn.sites.isNotEmpty()) {
+                    _dsnFlow.value = dsn
+                    _initiallyLoaded.value = DataStatus.LOADED
                 }
             }
         }

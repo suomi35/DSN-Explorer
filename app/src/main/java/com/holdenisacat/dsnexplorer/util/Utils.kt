@@ -106,8 +106,17 @@ object Utils {
         }
     }
 
-    fun distanceToString(distance: Float): String { // assumes distance in km
-        println(">>> distance IN: $distance")
+    fun distanceToString(distance: Float, estimated: Boolean = false): String {
+        val formatted = formatDistance(distance)
+        return if (estimated && formatted != "-") "~$formatted" else formatted
+    }
+
+    fun lightTimeToString(lightTime: Float, estimated: Boolean = false): String {
+        val formatted = formatLightTime(lightTime)
+        return if (estimated && formatted != "-") "~$formatted" else formatted
+    }
+
+    private fun formatDistance(distance: Float): String {
         return if (distance != 0.0f) {
             when {
                 distance == -1f -> "-"
@@ -115,15 +124,15 @@ object Utils {
                 distance < 1000000f -> "${formatter.format((distance / 1000f).toDouble())} thousand km"
                 distance < 1000000000f -> "${formatter.format((distance / 1000000f).toDouble())} million km"
                 distance < 1000000000000f -> "${formatter.format((distance / 1000000000f).toDouble())} billion km"
-                distance < 1000000000000000f -> "${formatter.format((distance / 1000000000000f).toDouble())} trillion km" // hey, someday
-                else -> "1+ quadrillion km" // hey, some Eon
+                distance < 1000000000000000f -> "${formatter.format((distance / 1000000000000f).toDouble())} trillion km"
+                else -> "1+ quadrillion km"
             }
         } else {
             "-"
         }
     }
 
-    fun lightTimeToString(lightTime: Float): String { // assumes lightTime in sec
+    private fun formatLightTime(lightTime: Float): String {
         return if (lightTime != 0.0f) {
             when {
                 lightTime == -1f -> "-"
@@ -134,7 +143,16 @@ object Utils {
                 else -> "1+ wk"
             }
         } else {
-            return "-"
+            "-"
         }
+    }
+
+    private const val SPEED_OF_LIGHT_KM_PER_SEC = 299792.458f
+
+    fun computeRoundTripLightTime(rangeKm: Float): Float {
+        if (rangeKm <= 0f || rangeKm == -1f) {
+            return -1f
+        }
+        return 2f * rangeKm / SPEED_OF_LIGHT_KM_PER_SEC
     }
 }

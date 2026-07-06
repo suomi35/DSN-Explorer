@@ -20,6 +20,7 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -61,7 +62,9 @@ fun SpacecraftListView(
                                             onSpacecraftClick(spacecraft)
                                         },
                                     text = spacecraft.friendlyName,
-                                    fontSize = 18.sp
+                                    fontSize = 18.sp,
+                                    maxLines = 2,
+                                    overflow = TextOverflow.Ellipsis,
                                 )
                                 Image(
                                     modifier = Modifier
@@ -80,7 +83,7 @@ fun SpacecraftListView(
                                         .align(Alignment.CenterVertically),
                                     text = stringResource(
                                         R.string.range,
-                                        Utils.distanceToString(spacecraft.uplegRange)
+                                        Utils.distanceToString(spacecraft.uplegRange, spacecraft.rangeIsEstimated)
                                     )
                                 )
                                 Text(
@@ -91,7 +94,7 @@ fun SpacecraftListView(
                                     textAlign = TextAlign.End,
                                     text = stringResource(
                                         R.string.roundtrip_light_time,
-                                        Utils.lightTimeToString(spacecraft.roundtripLightTime)
+                                        Utils.lightTimeToString(spacecraft.roundtripLightTime, spacecraft.rangeIsEstimated)
                                     )
                                 )
                             }

@@ -9,6 +9,7 @@ import com.holdenisacat.dsnexplorer.model.SignalDirection
 import com.holdenisacat.dsnexplorer.model.Site
 import com.holdenisacat.dsnexplorer.model.Spacecraft
 import com.holdenisacat.dsnexplorer.util.Constants
+import com.holdenisacat.dsnexplorer.util.Utils
 import org.xmlpull.v1.XmlPullParser
 import org.xmlpull.v1.XmlPullParserException
 import timber.log.Timber
@@ -81,7 +82,6 @@ class DataXmlPullParserHandler {
                         }
                     } else if (tagname.equals(Constants.UP_SIGNAL, ignoreCase = true)) {
                         signals.add(
-                            // <upSignal active="true" signalType="data" dataRate="0" frequency="0" band="X" power="18" spacecraft="JNO" spacecraftID="-61"/>
                             Signal(
                                 parser.getAttributeValue(null, Constants.ACTIVE).toBoolean(),
                                 parser.getAttributeValue(null, Constants.SIGNAL_TYPE),
@@ -89,7 +89,7 @@ class DataXmlPullParserHandler {
                                 parser.getAttributeValue(null, Constants.FREQUENCY),
                                 parser.getAttributeValue(null, Constants.BAND),
                                 parser.getAttributeValue(null, Constants.POWER),
-                                parser.getAttributeValue(null, Constants.SPACECRAFT),
+                                parser.getAttributeValue(null, Constants.SPACECRAFT).lowercase(),
                                 if (parser.getAttributeValue(null, Constants.SPACECRAFT_ID)
                                     .startsWith("-")) {
                                     parser.getAttributeValue(null, Constants.SPACECRAFT_ID).drop(1)
@@ -101,7 +101,6 @@ class DataXmlPullParserHandler {
                         )
                     } else if (tagname.equals(Constants.DOWN_SIGNAL, ignoreCase = true)) {
                         signals.add(
-                            // <downSignal active="true" signalType="data" dataRate="25970" frequency="0" band="X" power="-130" spacecraft="JNO" spacecraftID="-61"/>
                             Signal(
                                 parser.getAttributeValue(null, Constants.ACTIVE).toBoolean(),
                                 parser.getAttributeValue(null, Constants.SIGNAL_TYPE),
@@ -109,7 +108,7 @@ class DataXmlPullParserHandler {
                                 parser.getAttributeValue(null, Constants.FREQUENCY),
                                 parser.getAttributeValue(null, Constants.BAND),
                                 parser.getAttributeValue(null, Constants.POWER),
-                                parser.getAttributeValue(null, Constants.SPACECRAFT),
+                                parser.getAttributeValue(null, Constants.SPACECRAFT).lowercase(),
                                 if (parser.getAttributeValue(null, Constants.SPACECRAFT_ID)
                                     .startsWith("-")) {
                                     parser.getAttributeValue(null, Constants.SPACECRAFT_ID).drop(1)
@@ -130,12 +129,16 @@ class DataXmlPullParserHandler {
                             && spacecraft.name != Constants.DSN) {
                             Timber.tag(TAG).d(">>> enhancing spacecraft: ${spacecraft.name}")
                             spacecraft.id = parser.getAttributeValue(null, Constants.ID)
-                            spacecraft.uplegRange = parser.getAttributeValue(null,
-                                Constants.UPLEG_RANGE).toFloat()
-                            spacecraft.downlegRange = parser.getAttributeValue(null,
-                                Constants.DOWNLEG_RANGE).toFloat()
-                            spacecraft.roundtripLightTime = parser.getAttributeValue(null,
-                                Constants.ROUNDTRIP_LIGHT_TIME).toFloat()
+                            val uplegRange = parser.getAttributeValue(null, Constants.UPLEG_RANGE).toFloat()
+                            val downlegRange = parser.getAttributeValue(null, Constants.DOWNLEG_RANGE).toFloat()
+                            var roundtripLightTime = parser.getAttributeValue(null, Constants.ROUNDTRIP_LIGHT_TIME).toFloat()
+                            if (roundtripLightTime == -1f) {
+                                roundtripLightTime = Utils.computeRoundTripLightTime(uplegRange)
+                            }
+                            spacecraft.uplegRange = uplegRange
+                            spacecraft.downlegRange = downlegRange
+                            spacecraft.roundtripLightTime = roundtripLightTime
+                            spacecraft.rangeIsEstimated = uplegRange == -1f
                             spacecraftList.add(spacecraft)
                         } else {
                             Timber.tag(TAG).d(">>> no config entry for: ${parser.getAttributeValue(null, Constants.NAME)}")
@@ -179,7 +182,7 @@ class DataXmlPullParserHandler {
             e.printStackTrace()
         }
 
-        sites.sortedWith(compareByDescending { it.name })
+        sites.sortWith(compareBy { it.name })
         return Dsn(sites)
     }
 }

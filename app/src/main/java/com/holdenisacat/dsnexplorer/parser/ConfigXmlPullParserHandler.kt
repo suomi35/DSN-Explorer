@@ -88,7 +88,7 @@ class ConfigXmlPullParserHandler {
             e.printStackTrace()
         }
 
-        sites.sortedWith(compareByDescending { it.name })
+        sites.sortWith(compareBy { it.name })
 
         return Configuration(sites, spacecraftList)
     }

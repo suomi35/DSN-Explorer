@@ -13,14 +13,16 @@ import com.holdenisacat.dsnexplorer.util.Constants.CONFIGURATION_URL
 import com.holdenisacat.dsnexplorer.util.Constants.DSN_DATA_URL
 import io.ktor.client.request.get
 import io.ktor.client.statement.bodyAsBytes
-import io.ktor.client.statement.bodyAsText
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.withContext
+import timber.log.Timber
 import java.io.InputStream
 
-class DataRepository {
+class DataRepository(
+    private val rangeSupplementer: RangeSupplementer,
+) {
 
     private var configuration: Configuration by mutableStateOf(Configuration())
     private val _configurationFlow = MutableStateFlow(configuration)
@@ -31,39 +33,54 @@ class DataRepository {
     val configurationFlow: StateFlow<Configuration> get() = _configurationFlow
     val dsnFlow: StateFlow<Dsn> get() = _dsnFlow
 
-    suspend fun fetchConfig(): DataStatus {
-        val dataStatus: DataStatus
+    private var configLoaded = false
 
-        withContext(Dispatchers.IO) {
-            val configurationResponse = DsnExplorerApplication.ktorHttpClient.get(CONFIGURATION_URL)
-//            println(">>> configurationResponse: ${configurationResponse.bodyAsText()}")
-
-            val inputStream: InputStream = configurationResponse.bodyAsBytes().inputStream()
-            val configParser = ConfigXmlPullParserHandler()
-            _configurationFlow.value = configParser.parse(inputStream)
-
-            // dataStatus = DataStatus.ERROR
-            dataStatus = DataStatus.LOADED
+    suspend fun refresh(): DataStatus {
+        return try {
+            if (!configLoaded || _configurationFlow.value.sites.isEmpty()) {
+                fetchConfig()
+                configLoaded = true
+            }
+            fetchDsnData(_configurationFlow.value)
+        } catch (e: Exception) {
+            Timber.e(e, "Failed to refresh DSN data")
+            DataStatus.ERROR
         }
+    }
 
-        return dataStatus
+    suspend fun fetchConfig(): DataStatus {
+        return withContext(Dispatchers.IO) {
+            try {
+                val configurationResponse = DsnExplorerApplication.ktorHttpClient.get(CONFIGURATION_URL)
+                val inputStream: InputStream = configurationResponse.bodyAsBytes().inputStream()
+                val configParser = ConfigXmlPullParserHandler()
+                _configurationFlow.value = configParser.parse(inputStream)
+                DataStatus.LOADED
+            } catch (e: Exception) {
+                Timber.e(e, "Failed to fetch DSN configuration")
+                DataStatus.ERROR
+            }
+        }
     }
 
     suspend fun fetchDsnData(configuration: Configuration): DataStatus {
-        val dataStatus: DataStatus
+        return withContext(Dispatchers.IO) {
+            try {
+                val dsnResponse = DsnExplorerApplication.ktorHttpClient.get(
+                    DSN_DATA_URL + System.currentTimeMillis() / 1000
+                )
+                val dataParser = DataXmlPullParserHandler()
+                val parsedDsn = dataParser.parse(configuration, dsnResponse.bodyAsBytes().inputStream())
+                _dsnFlow.value = parsedDsn
 
-        withContext(Dispatchers.IO) {
-            val dsnResponse = DsnExplorerApplication.ktorHttpClient.get(DSN_DATA_URL
-                    + System.currentTimeMillis() / 1000)
-//            println(">>> dsnResponse: ${dsnResponse.bodyAsText()}")
-
-            val dataParser = DataXmlPullParserHandler()
-            _dsnFlow.value = dataParser.parse(configuration, dsnResponse.bodyAsBytes().inputStream())
-
-            // dataStatus = DataStatus.ERROR
-            dataStatus = DataStatus.LOADED
+                if (rangeSupplementer.supplement(parsedDsn)) {
+                    _dsnFlow.value = parsedDsn
+                }
+                DataStatus.LOADED
+            } catch (e: Exception) {
+                Timber.e(e, "Failed to fetch live DSN data")
+                DataStatus.ERROR
+            }
         }
-
-        return dataStatus
     }
 }

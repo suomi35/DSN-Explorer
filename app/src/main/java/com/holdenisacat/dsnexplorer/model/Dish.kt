@@ -28,7 +28,7 @@ data class Dish(
     fun getSpacecraftSignalsByDirection(spacecraft: Spacecraft, direction: SignalDirection): ArrayList<Signal> {
         val matchingSignals: ArrayList<Signal> = ArrayList()
         for (signal in signals) {
-            if (signal.spacecraft == spacecraft.name && signal.direction == direction) {
+            if (signal.spacecraft.equals(spacecraft.name, ignoreCase = true) && signal.direction == direction) {
                 matchingSignals.add(signal)
             }
         }
@@ -38,7 +38,7 @@ data class Dish(
     fun getSpacecraftSignals(spacecraft: Spacecraft): ArrayList<Signal> {
         val matchingSignals: ArrayList<Signal> = ArrayList()
         for (signal in signals) {
-            if (signal.spacecraft == spacecraft.name) {
+            if (signal.spacecraft.equals(spacecraft.name, ignoreCase = true)) {
                 matchingSignals.add(signal)
             }
         }
@@ -48,7 +48,7 @@ data class Dish(
     fun getSpacecraftActiveSignals(spacecraft: Spacecraft): ArrayList<Signal> {
         val matchingSignals: ArrayList<Signal> = ArrayList()
         for (signal in signals) {
-            if (signal.spacecraft == spacecraft.name && signal.active) {
+            if (signal.spacecraft.equals(spacecraft.name, ignoreCase = true) && signal.active) {
                 matchingSignals.add(signal)
             }
         }

@@ -202,12 +202,24 @@ class MainActivity : ComponentActivity(), KoinComponent {
 
                             when (initiallyLoaded) {
                                 DataStatus.LOADED -> {
+                                    if (dsn.sites.isEmpty()) {
+                                        Box(
+                                            Modifier.fillMaxSize(),
+                                            contentAlignment = Alignment.Center,
+                                        ) {
+                                            CircularProgressIndicator(
+                                                modifier = Modifier.requiredWidth(58.dp),
+                                                color = MaterialTheme.colorScheme.secondary,
+                                            )
+                                        }
+                                    } else {
+                                    val siteIndex = lastSiteIndex.coerceIn(0, dsn.sites.lastIndex)
                                     println(">>> selectedIndex: $selectedIndex")
 
                                     when (viewModeIndex) {
                                         0 -> {  // Sites view
                                             println("Sites view")
-                                            viewModel.updateSiteTime(dsn.sites[lastSiteIndex].getNiceTime())
+                                            viewModel.updateSiteTime(dsn.sites[siteIndex].getNiceTime())
 
                                             Column(
                                                 modifier = Modifier
@@ -218,7 +230,7 @@ class MainActivity : ComponentActivity(), KoinComponent {
                                                         .fillMaxSize()
                                                         .weight(1f)
                                                 ) {
-                                                    items(dsn.sites[lastSiteIndex].getDishes(false)) { dish ->
+                                                    items(dsn.sites[siteIndex].getDishes(false)) { dish ->
                                                         DishView(
                                                             dish,
                                                             onDishClick = {
@@ -237,7 +249,7 @@ class MainActivity : ComponentActivity(), KoinComponent {
                                                     dsn.sites.forEachIndexed { index, site ->
                                                         println(">>> creating UI for ${site.name}")
                                                         NavigationBarItem(
-                                                            selected = index == lastSiteIndex,
+                                                            selected = index == siteIndex,
                                                             onClick = {
                                                                 viewModel.updateSiteIndex(index)
 //                                                                viewModel.updateSiteTime(site.getNiceTime())
@@ -268,6 +280,7 @@ class MainActivity : ComponentActivity(), KoinComponent {
                                                 }
                                             )
                                         }
+                                    }
                                     }
                                 }
                                 DataStatus.LOADING -> {

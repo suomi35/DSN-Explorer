@@ -1,5 +1,8 @@
 package com.holdenisacat.dsnexplorer.model
 
+import com.holdenisacat.dsnexplorer.util.Constants
+import java.util.Locale
+
 data class Spacecraft(
 
     var name: String,
@@ -10,7 +13,11 @@ data class Spacecraft(
     var uplegRange: Float = 0f,
     var downlegRange: Float = 0f,
     var roundtripLightTime: Float = 0f,
-    var flag: Int = 0
+    var flag: Int = 0,
+    var rangeIsEstimated: Boolean = false
 ) {
     constructor() : this("", "", "")
+
+    fun getImageUrl(): String =
+        "${Constants.SPACECRAFT_IMAGES_BASE_URL}${name.lowercase(Locale.ROOT)}.jpg"
 }

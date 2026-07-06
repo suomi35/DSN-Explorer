@@ -1,6 +1,5 @@
 package com.holdenisacat.dsnexplorer.view
 
-import android.net.Uri
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -13,11 +12,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -39,7 +35,6 @@ import com.holdenisacat.dsnexplorer.model.Dish
 import com.holdenisacat.dsnexplorer.model.PreviewMock
 import com.holdenisacat.dsnexplorer.model.Spacecraft
 import com.holdenisacat.dsnexplorer.util.Utils
-import java.util.Locale
 
 @Composable
 fun SpacecraftDetailView(
@@ -64,19 +59,9 @@ fun SpacecraftDetailView(
                         .clickable {
                             onSpacecraftClick(spacecraft.friendlyName)
                         },
-                    model = stringResource(
-                        R.string.spacecraft_image_url,
-                        Uri.encode(spacecraft.friendlyName.lowercase(Locale.ROOT))
-                    ),
+                    model = spacecraft.getImageUrl(),
                     contentDescription = "spacecraft image",
                 )
-                IconButton(onClick = { onDismissDetailView() }
-                ) {
-                    Icon(
-                        Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = "dismiss detail screen"
-                    )
-                }
                 Text(
                     modifier = Modifier
                         .padding(start = 8.dp, bottom = 8.dp)

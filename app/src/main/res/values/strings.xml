@@ -46,6 +46,4 @@
 
     <string name="dish_inactive">Inactive</string>
     <string name="dish_size">Dish Size: %1$s</string>
-
-    <string name="spacecraft_image_url">https://eyes.nasa.gov/apps/dsn-now/images/spacecraft/%1$s.jpg</string>
 </resources>

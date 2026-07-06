@@ -30,7 +30,7 @@ data class Dsn(
             }
         }
         if (sortAlpha) {
-            spacecraftList.sortedWith(compareByDescending { it.friendlyName })
+            spacecraftList.sortWith(compareBy { it.friendlyName })
         }
         return spacecraftList
     }

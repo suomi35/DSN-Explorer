@@ -9,11 +9,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -35,10 +32,7 @@ import coil3.compose.AsyncImage
 import com.holdenisacat.dsnexplorer.R
 import com.holdenisacat.dsnexplorer.model.Dish
 import com.holdenisacat.dsnexplorer.model.PreviewMock
-import com.holdenisacat.dsnexplorer.model.SignalDirection
 import com.holdenisacat.dsnexplorer.model.Spacecraft
-import com.holdenisacat.dsnexplorer.ui.component.AnimatedVectorDrawable
-import com.holdenisacat.dsnexplorer.util.Constants
 import com.holdenisacat.dsnexplorer.util.Utils
 
 @Composable
@@ -68,13 +62,6 @@ fun DishDetailView(
                     model = dish.getDishImageUrl(),
                     contentDescription = "spacecraft image",
                 )
-                IconButton(onClick = { onDismissDetailView() }
-                ) {
-                    Icon(
-                        Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = "dismiss detail screen"
-                    )
-                }
                 Text(
                     modifier = Modifier
                         .padding(8.dp)
@@ -142,53 +129,21 @@ fun DishDetailView(
                         .verticalScroll(scrollState)
                 ) {
                     dish.spacecraftList.forEach { spacecraft ->
-                        Row(
+                        SpacecraftTargetRow(
+                            spacecraft = spacecraft,
+                            dish = dish,
                             modifier = Modifier
                                 .padding(top = 8.dp)
-                                .clickable {
-                                    onSpacecraftClick(spacecraft)
-                                }
-                        ) {
-                            Icon(
-                                painter = painterResource(id = R.drawable.ic_my_location),
-                                tint = MaterialTheme.colorScheme.secondary,
-                                contentDescription = "target icon",
-                                modifier = Modifier
-                                    .padding(1.dp)
-                            )
-                            Text(
-                                modifier = Modifier
-                                    .padding(4.dp),
-                                text = spacecraft.friendlyName,
-                                fontWeight = FontWeight.Bold,
-                                fontSize = 18.sp
-                            )
-                            Spacer(Modifier.weight(1f))
-                            dish.getSpacecraftSignalsByDirection(spacecraft, SignalDirection.UP)
-                                .forEach { upSignal ->
-                                    when (upSignal.signalType) {
-                                        Constants.DATA_SIGNAL -> {
-                                            AnimatedVectorDrawable(R.drawable.uplink_data_animation)
-                                        }
-
-                                        Constants.CARRIER_SIGNAL -> {
-                                            AnimatedVectorDrawable(R.drawable.uplink_carrier_animation)
-                                        }
-                                    }
-                                }
-                            dish.getSpacecraftSignalsByDirection(spacecraft, SignalDirection.DOWN)
-                                .forEach { downSignal ->
-                                    when (downSignal.signalType) {
-                                        Constants.DATA_SIGNAL -> {
-                                            AnimatedVectorDrawable(R.drawable.downlink_data_animation)
-                                        }
-
-                                        Constants.CARRIER_SIGNAL -> {
-                                            AnimatedVectorDrawable(R.drawable.downlink_carrier_animation)
-                                        }
-                                    }
-                                }
-                        }
+                                .clickable { onSpacecraftClick(spacecraft) },
+                            leadingIcon = {
+                                Icon(
+                                    painter = painterResource(id = R.drawable.ic_my_location),
+                                    tint = MaterialTheme.colorScheme.secondary,
+                                    contentDescription = "target icon",
+                                    modifier = Modifier.padding(1.dp),
+                                )
+                            },
+                        )
                         Row {
                             Text(
                                 modifier = Modifier
@@ -196,7 +151,7 @@ fun DishDetailView(
                                     .align(Alignment.CenterVertically),
                                 text = stringResource(
                                     R.string.range,
-                                    Utils.distanceToString(spacecraft.uplegRange)
+                                    Utils.distanceToString(spacecraft.uplegRange, spacecraft.rangeIsEstimated)
                                 )
                             )
                             Text(
@@ -207,7 +162,7 @@ fun DishDetailView(
                                 textAlign = TextAlign.End,
                                 text = stringResource(
                                     R.string.roundtrip_light_time,
-                                    Utils.lightTimeToString(spacecraft.roundtripLightTime)
+                                    Utils.lightTimeToString(spacecraft.roundtripLightTime, spacecraft.rangeIsEstimated)
                                 )
                             )
                         }

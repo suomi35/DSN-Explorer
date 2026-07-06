@@ -124,22 +124,6 @@
                     android:valueType="pathType"
                     android:interpolator="@android:interpolator/fast_out_slow_in"/>
                 <objectAnimator
-                    android:propertyName="pathData"
-                    android:startOffset="1000"
-                    android:duration="750"
-                    android:valueFrom="M 4.068 0.611 C 4.069 2.23 5.382 3.541 7 3.541 C 8.618 3.541 9.931 2.23 9.932 0.611"
-                    android:valueTo="M 4.068 12.155 C 4.069 13.773 5.381 15.085 7 15.085 C 8.619 15.085 9.931 13.773 9.932 12.155"
-                    android:valueType="pathType"
-                    android:interpolator="@android:interpolator/fast_out_slow_in"/>
-                <objectAnimator
-                    android:propertyName="pathData"
-                    android:startOffset="2000"
-                    android:duration="750"
-                    android:valueFrom="M 4.068 0.611 C 4.069 2.23 5.382 3.541 7 3.541 C 8.618 3.541 9.931 2.23 9.932 0.611"
-                    android:valueTo="M 4.068 12.155 C 4.069 13.773 5.381 15.085 7 15.085 C 8.619 15.085 9.931 13.773 9.932 12.155"
-                    android:valueType="pathType"
-                    android:interpolator="@android:interpolator/fast_out_slow_in"/>
-                <objectAnimator
                     android:propertyName="strokeAlpha"
                     android:startOffset="300"
                     android:duration="450"
@@ -148,32 +132,64 @@
                     android:valueType="floatType"
                     android:interpolator="@android:interpolator/fast_out_slow_in"/>
                 <objectAnimator
+                    android:propertyName="pathData"
+                    android:startOffset="750"
+                    android:duration="1"
+                    android:valueFrom="M 4.068 0.611 C 4.069 2.23 5.382 3.541 7 3.541 C 8.618 3.541 9.931 2.23 9.932 0.611"
+                    android:valueTo="M 4.068 0.611 C 4.069 2.23 5.382 3.541 7 3.541 C 8.618 3.541 9.931 2.23 9.932 0.611"
+                    android:valueType="pathType"
+                    android:interpolator="@android:anim/linear_interpolator"/>
+                <objectAnimator
                     android:propertyName="strokeAlpha"
-                    android:startOffset="1000"
-                    android:duration="100"
-                    android:valueFrom="1"
+                    android:startOffset="750"
+                    android:duration="1"
+                    android:valueFrom="0"
                     android:valueTo="1"
                     android:valueType="floatType"
+                    android:interpolator="@android:anim/linear_interpolator"/>
+                <objectAnimator
+                    android:propertyName="pathData"
+                    android:startOffset="750"
+                    android:duration="750"
+                    android:valueFrom="M 4.068 0.611 C 4.069 2.23 5.382 3.541 7 3.541 C 8.618 3.541 9.931 2.23 9.932 0.611"
+                    android:valueTo="M 4.068 12.155 C 4.069 13.773 5.381 15.085 7 15.085 C 8.619 15.085 9.931 13.773 9.932 12.155"
+                    android:valueType="pathType"
                     android:interpolator="@android:interpolator/fast_out_slow_in"/>
                 <objectAnimator
                     android:propertyName="strokeAlpha"
-                    android:startOffset="2000"
-                    android:duration="100"
-                    android:valueFrom="1"
-                    android:valueTo="1"
-                    android:valueType="floatType"
-                    android:interpolator="@android:interpolator/fast_out_slow_in"/>
-                <objectAnimator
-                    android:propertyName="strokeAlpha"
-                    android:startOffset="1300"
+                    android:startOffset="1050"
                     android:duration="450"
                     android:valueFrom="1"
                     android:valueTo="0"
                     android:valueType="floatType"
                     android:interpolator="@android:interpolator/fast_out_slow_in"/>
                 <objectAnimator
+                    android:propertyName="pathData"
+                    android:startOffset="1500"
+                    android:duration="1"
+                    android:valueFrom="M 4.068 0.611 C 4.069 2.23 5.382 3.541 7 3.541 C 8.618 3.541 9.931 2.23 9.932 0.611"
+                    android:valueTo="M 4.068 0.611 C 4.069 2.23 5.382 3.541 7 3.541 C 8.618 3.541 9.931 2.23 9.932 0.611"
+                    android:valueType="pathType"
+                    android:interpolator="@android:anim/linear_interpolator"/>
+                <objectAnimator
                     android:propertyName="strokeAlpha"
-                    android:startOffset="2300"
+                    android:startOffset="1500"
+                    android:duration="1"
+                    android:valueFrom="0"
+                    android:valueTo="1"
+                    android:valueType="floatType"
+                    android:interpolator="@android:anim/linear_interpolator"/>
+                <objectAnimator
+                    android:propertyName="pathData"
+                    android:startOffset="1500"
+                    android:duration="750"
+                    android:valueFrom="M 4.068 0.611 C 4.069 2.23 5.382 3.541 7 3.541 C 8.618 3.541 9.931 2.23 9.932 0.611"
+                    android:valueTo="M 4.068 12.155 C 4.069 13.773 5.381 15.085 7 15.085 C 8.619 15.085 9.931 13.773 9.932 12.155"
+                    android:valueType="pathType"
+                    android:interpolator="@android:interpolator/fast_out_slow_in"/>
+                <objectAnimator
+                    android:propertyName="strokeAlpha"
+                    android:startOffset="1800"
                     android:duration="450"
                     android:valueFrom="1"
                     android:valueTo="0"

@@ -27,11 +27,8 @@ import androidx.compose.ui.unit.sp
 import com.holdenisacat.dsnexplorer.R
 import com.holdenisacat.dsnexplorer.model.Dish
 import com.holdenisacat.dsnexplorer.model.PreviewMock
-import com.holdenisacat.dsnexplorer.model.SignalDirection
 import com.holdenisacat.dsnexplorer.model.Spacecraft
-import com.holdenisacat.dsnexplorer.ui.component.AnimatedVectorDrawable
 import com.holdenisacat.dsnexplorer.ui.theme.LocalCustomColorPalette
-import com.holdenisacat.dsnexplorer.util.Constants
 import com.holdenisacat.dsnexplorer.util.Utils
 
 @Composable
@@ -115,58 +112,20 @@ fun DishView(
                     }
                     Spacer(modifier = Modifier.size(4.dp))
                     dish.spacecraftList.forEach { spacecraft ->
-                        Row(
+                        SpacecraftTargetRow(
+                            spacecraft = spacecraft,
+                            dish = dish,
                             modifier = Modifier
                                 .padding(top = 8.dp)
-                                .clickable {
-                                    onSpacecraftClick(spacecraft)
-                                }
-                        ) {
-                                Icon(
-                                    painter = painterResource(id = R.drawable.ic_satellite),
-                                    tint = MaterialTheme.colorScheme.secondary,
-                                    contentDescription = "satellite icon",
-                                    modifier = Modifier
-                                        .padding(1.dp)
-                                )
-                                Text(
-                                    modifier = Modifier
-                                        .padding(4.dp),
-                                    text = spacecraft.friendlyName,
-                                    fontWeight = FontWeight.Bold,
-                                    fontSize = 18.sp
-                                )
-                            Spacer(Modifier.weight(1f))
-                                    dish.getSpacecraftSignalsByDirection(spacecraft, SignalDirection.UP).forEach { upSignal ->
-                                        when (upSignal.signalType) {
-                                            Constants.DATA_SIGNAL -> {
-                                                AnimatedVectorDrawable(R.drawable.uplink_data_animation)
-                                            }
-
-                                            Constants.CARRIER_SIGNAL -> {
-                                                AnimatedVectorDrawable(R.drawable.uplink_carrier_animation)
-                                            }
-                                        }
-                                    }
-                                    dish.getSpacecraftSignalsByDirection(spacecraft, SignalDirection.DOWN).forEach { downSignal ->
-                                        when (downSignal.signalType) {
-                                            Constants.DATA_SIGNAL -> {
-                                                AnimatedVectorDrawable(R.drawable.downlink_data_animation)
-                                            }
-
-                                            Constants.CARRIER_SIGNAL -> {
-                                                AnimatedVectorDrawable(R.drawable.downlink_carrier_animation)
-                                            }
-                                        }
-                                    }
-                                }
+                                .clickable { onSpacecraftClick(spacecraft) },
+                        )
                         Row {
                             Text(
                                 modifier = Modifier
                                     .padding(2.dp)
                                     .align(Alignment.CenterVertically),
                                 text = stringResource(R.string.range,
-                                    Utils.distanceToString(spacecraft.uplegRange))
+                                    Utils.distanceToString(spacecraft.uplegRange, spacecraft.rangeIsEstimated))
                             )
                             Text(
                                 modifier = Modifier
@@ -176,7 +135,7 @@ fun DishView(
                                 textAlign = TextAlign.End,
                                 text = stringResource(
                                     R.string.roundtrip_light_time,
-                                    Utils.lightTimeToString(spacecraft.roundtripLightTime)
+                                    Utils.lightTimeToString(spacecraft.roundtripLightTime, spacecraft.rangeIsEstimated)
                                 )
                             )
                         }

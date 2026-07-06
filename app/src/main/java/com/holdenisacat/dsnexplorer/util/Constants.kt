@@ -29,6 +29,7 @@ object Constants {
     const val DISH = "dish"
     const val DISH_EXTERNAL_LINK = "https://www.google.com/search?q=NASA+"
     const val DISH_IMAGES_BASE_URL = "https://eyes.nasa.gov/dsn/dish/"
+    const val SPACECRAFT_IMAGES_BASE_URL = BASE_URL + "images/spacecraft/"
     const val DOWN_SIGNAL = "downSignal"
     const val DOWNLEG_RANGE = "downlegRange"
     const val DSN = "dsn"
