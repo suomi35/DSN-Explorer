@@ -1,86 +1,72 @@
 package com.holdenisacat.dsnexplorer.repository
 
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
-import com.holdenisacat.dsnexplorer.DsnExplorerApplication
 import com.holdenisacat.dsnexplorer.model.Configuration
 import com.holdenisacat.dsnexplorer.model.DataStatus
 import com.holdenisacat.dsnexplorer.model.Dsn
-import com.holdenisacat.dsnexplorer.parser.ConfigXmlPullParserHandler
-import com.holdenisacat.dsnexplorer.parser.DataXmlPullParserHandler
-import com.holdenisacat.dsnexplorer.util.Constants.CONFIGURATION_URL
-import com.holdenisacat.dsnexplorer.util.Constants.DSN_DATA_URL
+import com.holdenisacat.dsnexplorer.parser.ConfigXmlParser
+import com.holdenisacat.dsnexplorer.parser.DataXmlParser
+import com.holdenisacat.dsnexplorer.util.DsnApi
+import io.ktor.client.HttpClient
 import io.ktor.client.request.get
 import io.ktor.client.statement.bodyAsBytes
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.withContext
 import timber.log.Timber
-import java.io.InputStream
+import java.io.IOException
 
+/**
+ * Single source of truth for live DSN data.
+ *
+ * [refresh] loads the static configuration once, then polls the live feed on
+ * every call. The supplemented model (with JPL Horizons ranges where the DSN
+ * feed omits them) is emitted exactly once per cycle.
+ */
 class DataRepository(
+    private val httpClient: HttpClient,
+    private val configParser: ConfigXmlParser,
+    private val dataParser: DataXmlParser,
     private val rangeSupplementer: RangeSupplementer,
 ) {
 
-    private var configuration: Configuration by mutableStateOf(Configuration())
-    private val _configurationFlow = MutableStateFlow(configuration)
+    private val _configuration = MutableStateFlow<Configuration?>(null)
+    val configuration: StateFlow<Configuration?> = _configuration.asStateFlow()
 
-    private var dsn: Dsn by mutableStateOf(Dsn())
-    private val _dsnFlow = MutableStateFlow(dsn)
+    private val _dsn = MutableStateFlow<Dsn?>(null)
+    val dsn: StateFlow<Dsn?> = _dsn.asStateFlow()
 
-    val configurationFlow: StateFlow<Configuration> get() = _configurationFlow
-    val dsnFlow: StateFlow<Dsn> get() = _dsnFlow
-
-    private var configLoaded = false
-
-    suspend fun refresh(): DataStatus {
-        return try {
-            if (!configLoaded || _configurationFlow.value.sites.isEmpty()) {
-                fetchConfig()
-                configLoaded = true
+    /**
+     * Fetches configuration (on first call) plus live data and publishes the result.
+     *
+     * @throws IOException on network or payload failures so callers can distinguish
+     *   transport errors from an empty-but-valid feed.
+     */
+    suspend fun refresh(): DataStatus = withContext(Dispatchers.IO) {
+        try {
+            if (_configuration.value == null) {
+                fetchConfiguration()
             }
-            fetchDsnData(_configurationFlow.value)
-        } catch (e: Exception) {
+            fetchDsnData(_configuration.value ?: return@withContext DataStatus.ERROR)
+            DataStatus.LOADED
+        } catch (e: IOException) {
             Timber.e(e, "Failed to refresh DSN data")
             DataStatus.ERROR
         }
     }
 
-    suspend fun fetchConfig(): DataStatus {
-        return withContext(Dispatchers.IO) {
-            try {
-                val configurationResponse = DsnExplorerApplication.ktorHttpClient.get(CONFIGURATION_URL)
-                val inputStream: InputStream = configurationResponse.bodyAsBytes().inputStream()
-                val configParser = ConfigXmlPullParserHandler()
-                _configurationFlow.value = configParser.parse(inputStream)
-                DataStatus.LOADED
-            } catch (e: Exception) {
-                Timber.e(e, "Failed to fetch DSN configuration")
-                DataStatus.ERROR
-            }
-        }
+    private suspend fun fetchConfiguration() {
+        val bytes = httpClient.get(DsnApi.CONFIGURATION_URL).bodyAsBytes()
+        _configuration.value = configParser.parse(bytes.inputStream())
     }
 
-    suspend fun fetchDsnData(configuration: Configuration): DataStatus {
-        return withContext(Dispatchers.IO) {
-            try {
-                val dsnResponse = DsnExplorerApplication.ktorHttpClient.get(
-                    DSN_DATA_URL + System.currentTimeMillis() / 1000
-                )
-                val dataParser = DataXmlPullParserHandler()
-                val parsedDsn = dataParser.parse(configuration, dsnResponse.bodyAsBytes().inputStream())
-                _dsnFlow.value = parsedDsn
-
-                if (rangeSupplementer.supplement(parsedDsn)) {
-                    _dsnFlow.value = parsedDsn
-                }
-                DataStatus.LOADED
-            } catch (e: Exception) {
-                Timber.e(e, "Failed to fetch live DSN data")
-                DataStatus.ERROR
-            }
-        }
+    private suspend fun fetchDsnData(configuration: Configuration) {
+        val cacheBustedUrl = DsnApi.DATA_URL + System.currentTimeMillis() / 1000
+        val bytes = httpClient.get(cacheBustedUrl).bodyAsBytes()
+        val parsed = dataParser.parse(configuration, bytes.inputStream())
+        // Ranges are supplemented before the single emission so collectors never
+        // observe a half-updated model.
+        _dsn.value = rangeSupplementer.supplement(parsed)
     }
 }

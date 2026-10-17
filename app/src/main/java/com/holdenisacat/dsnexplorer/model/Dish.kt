@@ -1,93 +1,69 @@
 package com.holdenisacat.dsnexplorer.model
 
-import android.net.Uri
-import com.holdenisacat.dsnexplorer.util.Constants
+import com.holdenisacat.dsnexplorer.util.DsnApi
 import java.time.OffsetDateTime
 import java.time.ZoneOffset
 import kotlin.math.floor
 
 data class Dish(
-
-    var name: String,
-    var friendlyName: String,
-    var type: String,
-    var azimuthAngle: Float = 0f,
-    var elevationAngle: Float = 0f,
-    var windSpeed: String = "",
-    var isMSPA: Boolean = false, // Multiple Spacecraft Per Aperture (MSPA) capability of the DSN, which allows a single DSN antenna to receive downlink from up to two spacecraft simultaneously.
-    var isArray: Boolean = false,
-    var isDDOR: Boolean = false, // Delta-DOR uses two widely separated antennas to simultaneously track a transmitting probe in order to measure the time difference (delay time) between signals arriving at the two stations. The technique of measuring this delay is named Differential One-way Range (DOR).
-    var activity: String = "",
-    var isActive: Boolean = false,
-    var dishLocation: String = "",
-    var signals: ArrayList<Signal> = ArrayList(),
-    var spacecraftList: ArrayList<Spacecraft> = ArrayList()
+    val name: String,
+    val friendlyName: String,
+    val type: String,
+    val azimuthAngle: Float = 0f,
+    val elevationAngle: Float = 0f,
+    val windSpeed: String = "",
+    /** Multiple Spacecraft Per Aperture: one antenna receiving downlink from up to two spacecraft. */
+    val isMSPA: Boolean = false,
+    /** Two or more antennas combined to act as a single larger aperture. */
+    val isArray: Boolean = false,
+    /** Delta-DOR: two separated antennas measuring signal arrival delay for navigation. */
+    val isDDOR: Boolean = false,
+    val activity: String = "",
+    val siteName: String = "",
+    val signals: List<Signal> = emptyList(),
+    val spacecraftList: List<Spacecraft> = emptyList(),
 ) {
-    constructor() : this("", "", "")
+    /** A dish is considered active when at least one of its signals is meaningful. */
+    val isActive: Boolean
+        get() = signals.any { it.type != SignalType.NONE }
 
-    fun getSpacecraftSignalsByDirection(spacecraft: Spacecraft, direction: SignalDirection): ArrayList<Signal> {
-        val matchingSignals: ArrayList<Signal> = ArrayList()
-        for (signal in signals) {
-            if (signal.spacecraft.equals(spacecraft.name, ignoreCase = true) && signal.direction == direction) {
-                matchingSignals.add(signal)
-            }
+    val mode: String
+        get() = when {
+            isMSPA -> "MSPA"
+            isArray -> "Array"
+            isDDOR -> "ΔDOR"
+            else -> ""
         }
-        return matchingSignals
-    }
 
-    fun getSpacecraftSignals(spacecraft: Spacecraft): ArrayList<Signal> {
-        val matchingSignals: ArrayList<Signal> = ArrayList()
-        for (signal in signals) {
-            if (signal.spacecraft.equals(spacecraft.name, ignoreCase = true)) {
-                matchingSignals.add(signal)
-            }
-        }
-        return matchingSignals
-    }
+    fun signalsFor(spacecraft: Spacecraft): List<Signal> =
+        signals.filter { it.spacecraft.equals(spacecraft.name, ignoreCase = true) }
 
-    fun getSpacecraftActiveSignals(spacecraft: Spacecraft): ArrayList<Signal> {
-        val matchingSignals: ArrayList<Signal> = ArrayList()
-        for (signal in signals) {
-            if (signal.spacecraft.equals(spacecraft.name, ignoreCase = true) && signal.active) {
-                matchingSignals.add(signal)
-            }
-        }
-        return matchingSignals
-    }
+    fun activeSignalsFor(spacecraft: Spacecraft): List<Signal> =
+        signalsFor(spacecraft).filter { it.active }
 
-    fun getDishMode(): String {
-        return if (isMSPA) {
-            "MSPA"
-        } else if (isArray) {
-            "Array"
-        } else if (isDDOR) {
-            "ΔDOR"
-        } else {
-            ""
-        }
-    }
+    fun signalsFor(spacecraft: Spacecraft, direction: SignalDirection): List<Signal> =
+        signalsFor(spacecraft).filter { it.direction == direction }
 
-    fun getDishImageUrl(): Uri {
-        var azimuth = (floor(azimuthAngle / 15) * 15).toInt()
+    /**
+     * Thumbnail of the dish rendered by NASA's Eyes on the Solar System.
+     *
+     * Azimuth/elevation are quantized to the available artwork resolution and the
+     * current UTC time is clamped to a 15-minute window. [now] is injectable for tests.
+     */
+    fun imageUrl(now: OffsetDateTime = OffsetDateTime.now(ZoneOffset.UTC)): String {
+        val azimuth = (floor(azimuthAngle / 15) * 15).toInt().let { if (it == 360) 0 else it }
         val elevation = (floor(elevationAngle / 10) * 10).toInt()
-        if (azimuth == 360) {
-            azimuth = 0
-        }
 
-        // Add the minutes in the day passed so far, for thumbnail viewing.
-        val utcTime = OffsetDateTime.now(ZoneOffset.UTC)
-        val minutes = utcTime.hour * 60 + utcTime.minute
-        var clampedMinutes = (floor((minutes / 15).toDouble()) * 15).toInt()
-        if (clampedMinutes == 1440) {
-            clampedMinutes = 0
-        }
-        // Hack here to get DSS 56 thumbnail showing as DSS 55
-        val dishName = when (name) {
+        val minutes = now.hour * 60 + now.minute
+        val clampedMinutes = (floor(minutes / 15.0) * 15).toInt().let { if (it == 1440) 0 else it }
+
+        // DSS 56 and DSS 53 artwork are only published under their sibling dish names.
+        val artworkName = when (name) {
             "DSS56" -> "DSS55"
             "DSS53" -> "DSS54"
             else -> name
         }
 
-        return Uri.parse("${Constants.DISH_IMAGES_BASE_URL}${dishName}_${azimuth}_${elevation}_${clampedMinutes}.png")
+        return "${DsnApi.DISH_IMAGES_BASE_URL}${artworkName}_${azimuth}_${elevation}_${clampedMinutes}.png"
     }
 }

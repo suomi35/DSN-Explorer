@@ -1,113 +1,114 @@
 package com.holdenisacat.dsnexplorer
 
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.holdenisacat.dsnexplorer.model.DataStatus
 import com.holdenisacat.dsnexplorer.model.Dish
 import com.holdenisacat.dsnexplorer.model.Dsn
+import com.holdenisacat.dsnexplorer.model.Mode
 import com.holdenisacat.dsnexplorer.model.Spacecraft
 import com.holdenisacat.dsnexplorer.repository.DataRepository
-import com.holdenisacat.dsnexplorer.repository.WorkHandler
 import com.holdenisacat.dsnexplorer.util.DsnExplorerPreferences
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
 
-class MainViewModel : ViewModel(), KoinComponent {
+/**
+ * Single source of truth for everything the UI renders.
+ *
+ * Data refreshes on a foreground-only 5-second poll started with [startUpdates]
+ * and cancelled with [stopUpdates] — no WorkManager needed for a live viewer
+ * that only matters while visible.
+ */
+class MainViewModel(
+    private val repository: DataRepository,
+    private val preferences: DsnExplorerPreferences,
+) : ViewModel() {
 
-    private val dataRepository: DataRepository by inject<DataRepository>()
-    private val preferences: DsnExplorerPreferences by inject()
+    /** Top-level screen state: loading, loaded-with-data, or error. */
+    val uiState: StateFlow<DsnUiState> = repository.dsn
+        .map { dsn -> if (dsn != null) DsnUiState.Loaded(dsn) else DsnUiState.Loading }
+        .stateIn(viewModelScope, SharingStarted.Eagerly, DsnUiState.Loading)
 
-    private val _initiallyLoaded = MutableStateFlow(DataStatus.LOADING)
-    val dataStatusFlow = _initiallyLoaded.asStateFlow()
+    private val _selectedMode = MutableStateFlow(Mode.fromIndex(preferences.lastModeIndex))
+    val selectedMode: StateFlow<Mode> = _selectedMode.asStateFlow()
 
-    private val _siteTime = MutableStateFlow("")
-    val siteTimeFlow = _siteTime.asStateFlow()
+    private val _selectedSiteIndex = MutableStateFlow(preferences.lastSiteIndex)
+    val selectedSiteIndex: StateFlow<Int> = _selectedSiteIndex.asStateFlow()
 
-    private val _currentModeIndex = MutableStateFlow(preferences.lastModeIndex)
-    val currentModeIndexFlow: StateFlow<Int> = _currentModeIndex.asStateFlow()
+    private val _detail = MutableStateFlow<DetailState>(DetailState.None)
+    val detail: StateFlow<DetailState> = _detail.asStateFlow()
 
-    private val currentSiteIndex: Int by mutableIntStateOf(preferences.lastSiteIndex)
-    private val _currentSiteIndexFlow = MutableStateFlow(currentSiteIndex)
-    val currentSiteIndexFlow: StateFlow<Int> get() = _currentSiteIndexFlow
+    private val _refreshError = MutableStateFlow(false)
+    val refreshError: StateFlow<Boolean> = _refreshError.asStateFlow()
 
-    private val dsn: Dsn by mutableStateOf(Dsn())
-    private val _dsnFlow = MutableStateFlow(dsn)
-    val dsnFlow: StateFlow<Dsn> get() = _dsnFlow
+    private var pollJob: Job? = null
 
-    private val currentDish: Dish by mutableStateOf(Dish())
-    private val _currentDishFlow = MutableStateFlow(currentDish)
-    val currentDishFlow: StateFlow<Dish> get() = _currentDishFlow
-
-//    private val dishes: LinkedHashSet<Dish> by mutableStateOf(LinkedHashSet())
-//    private val _dishesFlow = MutableStateFlow(dishes)
-//    val dishesFlow: StateFlow<LinkedHashSet<Dish>> get() = _dishesFlow
-
-    private val dishDetail: Dish by mutableStateOf(Dish())
-    private val _dishDetailFlow = MutableStateFlow(dishDetail)
-    val dishDetailFlow: StateFlow<Dish> get() = _dishDetailFlow
-
-    private val spacecraftDetail: Spacecraft by mutableStateOf(Spacecraft())
-    private val _spacecraftDetailFlow = MutableStateFlow(spacecraftDetail)
-    val spacecraftDetailFlow: StateFlow<Spacecraft> get() = _spacecraftDetailFlow
-
-    init {
-        viewModelScope.launch {
-            dataRepository.dsnFlow.collect { dsn ->
-                if (dsn.sites.isNotEmpty()) {
-                    _dsnFlow.value = dsn
-                    _initiallyLoaded.value = DataStatus.LOADED
-                }
+    fun startUpdates() {
+        if (pollJob?.isActive == true) return
+        pollJob = viewModelScope.launch {
+            while (isActive) {
+                _refreshError.value = repository.refresh() == DataStatus.ERROR
+                delay(POLL_INTERVAL_MS)
             }
         }
     }
 
-    fun fetchDsnConfiguration() {
-        viewModelScope.launch {
-//            dataRepository.fetchConfig()
-            WorkHandler.createWork(0)
-        }
+    fun stopUpdates() {
+        pollJob?.cancel()
+        pollJob = null
     }
 
-    fun cancelDataUpdates() {
-        viewModelScope.launch {
-            WorkHandler.cancelWork()
-        }
+    fun selectMode(mode: Mode) {
+        preferences.lastModeIndex = mode.ordinal
+        _selectedMode.value = mode
     }
 
-    fun fetchDsnData() {
-        viewModelScope.launch {
-            dataRepository.fetchDsnData(dataRepository.configurationFlow.value)
-        }
+    fun selectSite(index: Int) {
+        val siteCount = (repository.dsn.value?.sites?.size ?: return).coerceAtLeast(1)
+        val clamped = index.coerceIn(0, siteCount - 1)
+        preferences.lastSiteIndex = clamped
+        _selectedSiteIndex.value = clamped
     }
 
-    fun updateSiteIndex(index: Int) {
-        preferences.lastSiteIndex = index
-        _currentSiteIndexFlow.value = index
+    fun showDishDetail(dish: Dish) {
+        _detail.value = DetailState.DishDetail(dish)
     }
 
-    fun updateMode(index: Int) {
-        println("updateMode: $index")
-        preferences.lastModeIndex = index
-//        _currentModeIndex.value = index
+    fun showSpacecraftDetail(spacecraft: Spacecraft) {
+        val dish = repository.dsn.value?.dishesForSpacecraft(spacecraft)?.firstOrNull() ?: return
+        _detail.value = DetailState.SpacecraftDetail(dish, spacecraft)
     }
 
-    fun triggerSpacecraftDetailView(dish: Dish, spacecraft: Spacecraft) {
-        _currentDishFlow.value = dish
-        _spacecraftDetailFlow.value = spacecraft
+    fun showSpacecraftDetail(dish: Dish, spacecraft: Spacecraft) {
+        _detail.value = DetailState.SpacecraftDetail(dish, spacecraft)
     }
 
-    fun triggerDishDetailView(dish: Dish) {
-        _dishDetailFlow.value = dish
+    fun dismissDetail() {
+        _detail.value = DetailState.None
     }
 
-    fun updateSiteTime(time: String = "") {
-        _siteTime.value = time
+    companion object {
+        private const val POLL_INTERVAL_MS = 5_000L
     }
+}
+
+/** Screen-level UI state derived from the repository's latest snapshot. */
+sealed interface DsnUiState {
+    data object Loading : DsnUiState
+    data class Loaded(val dsn: Dsn) : DsnUiState
+}
+
+/** At most one detail overlay is shown at a time, replacing ad-hoc boolean pairs. */
+sealed interface DetailState {
+    data object None : DetailState
+    data class DishDetail(val dish: Dish) : DetailState
+    data class SpacecraftDetail(val dish: Dish, val spacecraft: Spacecraft) : DetailState
 }

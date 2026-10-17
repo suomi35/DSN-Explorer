@@ -1,105 +1,34 @@
 package com.holdenisacat.dsnexplorer.model
 
-import com.holdenisacat.dsnexplorer.util.Constants
-import com.holdenisacat.dsnexplorer.util.Utils
-
+/**
+ * Immutable snapshot of the live Deep Space Network state across all three complexes.
+ */
 data class Dsn(
-
-    var sites: ArrayList<Site>
+    val sites: List<Site> = emptyList(),
 ) {
-    constructor() : this(ArrayList<Site>())
-
-    fun getAllActiveSpacecraft(sortAlpha: Boolean, ignoreUFOs: Boolean = true): ArrayList<Spacecraft> {
-        val spacecraftList = java.util.ArrayList<Spacecraft>()
-        for (site in sites) {
-            for (dish in site.dishes) {
-                for (spacecraft in dish.spacecraftList) {
-                    var addSpacecraftToList = true
-                    for (existingSpacecraft in spacecraftList) {
-                        if (existingSpacecraft.name == spacecraft.name
-                            || (ignoreUFOs && spacecraft.name == Constants.UFO)) {
-                            addSpacecraftToList = false
-                            break
-                        }
-                    }
-                    if (addSpacecraftToList) {
-                        spacecraft.flag = Utils.getSiteFlag(site.name)
-                        spacecraftList.add(spacecraft)
-                    }
-                }
+    /**
+     * Every distinct spacecraft currently tracked by a dish, sorted by display name.
+     *
+     * The DSN feed can report the same spacecraft from multiple antennas; the first
+     * occurrence wins and carries the complex flag of the site it was seen at.
+     */
+    fun activeSpacecraft(): List<Spacecraft> =
+        sites.flatMap { site ->
+            site.dishes.flatMap { dish ->
+                dish.spacecraftList.map { it.copy(siteName = site.name) }
             }
         }
-        if (sortAlpha) {
-            spacecraftList.sortWith(compareBy { it.friendlyName })
-        }
-        return spacecraftList
-    }
+            .filter { it.name.isNotBlank() && !UNKNOWN_TARGETS.contains(it.name) }
+            .distinctBy { it.name.lowercase() }
+            .sortedBy { it.friendlyName.lowercase() }
 
-    fun getAllDishesForSpacecraft(spacecraft: Spacecraft): LinkedHashSet<Dish> {
-        val dishList = LinkedHashSet<Dish>()
-        for (site in sites) {
-            for (dish in site.dishes) {
-                if (dish.signals.isNotEmpty()) {
-                    for (signal in dish.signals) {
-                        if (spacecraft.id == signal.spacecraftId) {
-                            dishList.add(dish)
-                        }
-                    }
-                }
-            }
-        }
-        return dishList
-    }
+    /** All dishes currently pointing at [spacecraft], across every site. */
+    fun dishesForSpacecraft(spacecraft: Spacecraft): List<Dish> =
+        sites.flatMap { it.dishes }
+            .filter { dish -> dish.spacecraftList.any { it.id == spacecraft.id && it.id.isNotBlank() } }
 
-    fun getAllDishesBySite(siteIndex: Int): ArrayList<Dish> {
-        return sites[siteIndex].dishes
-    }
-
-    fun getDishesBySite(siteIndex: Int, meaningfulOnly: Boolean): ArrayList<Dish>? {
-        if (sites[siteIndex].dishes.size > 0) {
-            val matchingDishes = java.util.ArrayList<Dish>()
-            for (dish in sites[siteIndex].dishes) {
-                // update each dish's active status
-                var isActive = false
-                // return only sensible dishes ;)
-                for (signal in dish.signals) {
-                    if (signal.signalType != Constants.NONE) {
-                        isActive = true
-                    }
-                }
-                if (isActive) {
-                    dish.isActive = true
-                    matchingDishes.add(dish)
-                }
-            }
-
-            return if (meaningfulOnly) {
-                matchingDishes
-            } else {
-                sites[siteIndex].dishes // just pass what we already have
-            }
-        } else {
-            return null
-        }
-    }
-
-    fun getSiteFromDish(dish: Dish): Site? {
-        for (site in sites) {
-            for (siteDish in site.dishes) {
-                if (siteDish.name == dish.name) {
-                    return site
-                }
-            }
-        }
-        return null
-    }
-
-    fun getSiteByName(name: String): Site? {
-        for (site in sites) {
-            if (site.name == name) {
-                return site
-            }
-        }
-        return null
+    companion object {
+        /** Placeholder entries the feed emits for unidentified or internal targets. */
+        private val UNKNOWN_TARGETS = setOf("UFO", "dsn")
     }
 }

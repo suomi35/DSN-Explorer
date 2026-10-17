@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config>
+  <site name="mdscc" friendlyName="Madrid" latitude="40.2413554" longitude="-4.2480085">
+    <dish name="DSS53" friendlyName="DSS 53" type="34M"/>
+    <dish name="DSS54" friendlyName="DSS 54" type="70M"/>
+  </site>
+  <site name="gdscc" friendlyName="Goldstone" latitude="35.4267" longitude="-116.8896">
+    <dish name="DSS26" friendlyName="DSS 26" type="34M"/>
+  </site>
+  <spacecraft name="M01O" explorerName="53" friendlyName="Mars Odyssey" thumbnail="true"/>
+  <spacecraft name="MVN" explorerName="202" friendlyName="MAVEN" thumbnail="true"/>
+</config>

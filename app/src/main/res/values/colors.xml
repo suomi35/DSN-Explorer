@@ -1,55 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="purple_200">#FFBB86FC</color>
-    <color name="purple_500">#FF6200EE</color>
-    <color name="purple_700">#FF3700B3</color>
-    <color name="teal_200">#FF03DAC5</color>
-    <color name="teal_700">#FF018786</color>
-    <color name="black">#FF000000</color>
-    <color name="white">#FFFFFFFF</color>
+    <color name="nasaRed">#FC3D21</color>
 
-    <color name="backgroundDDOR">#cad9e4</color>
-    <color name="backgroundMSPA">#F4d0d3</color>
-    <color name="backgroundArray">#e9ebef</color>
+    <!-- Signal header backgrounds referenced by the AVD dish animations -->
     <color name="backgroundDataTypeDataUpHeader">#FFD7BA</color>
-    <color name="backgroundDataTypeCarrierDownHeader">#DCF6DC</color>
-    <color name="backgroundDataTypeCarrierUpHeader">#FFFBD2</color>
     <color name="backgroundDataTypeDataDownHeader">#DAEAF5</color>
-    <color name="backgroundDataTypeRangingUpHeader">#FFD6DA</color>
 
-    <!--uplink data dish coloring -->
+    <!-- Uplink data dish coloring -->
     <color name="uplinkDataDishOutline">#666666</color>
-    <color name="uplinkDataDishBase">#d3d7df</color>
+    <color name="uplinkDataDishBase">#D3D7DF</color>
     <color name="uplinkDataDishBack">@color/backgroundDataTypeDataUpHeader</color>
-    <color name="uplinkDataDishRing">#e9ebef</color>
-    <color name="uplinkDataDishTip">#bdc4d0</color>
+    <color name="uplinkDataDishRing">#E9EBEF</color>
+    <color name="uplinkDataDishTip">#BDC4D0</color>
     <color name="uplinkDataSignalColor">@color/nasaRed</color>
-
-    <!--downlink data dish coloring -->
-    <color name="downlinkDataDishOutline">#666666</color>
-    <color name="downlinkDataDishBase">#d3d7df</color>
-    <color name="downlinkDataDishBack">@color/backgroundDataTypeDataDownHeader</color>
-    <color name="downlinkDataDishRing">#e9ebef</color>
-    <color name="downlinkDataDishTip">#bdc4d0</color>
-    <color name="downlinkDataSignalColor">#3741d3</color>
-
-    <!--uplink carrier dish coloring -->
-    <color name="uplinkCarrierDishOutline">#666666</color>
-    <color name="uplinkCarrierDishBase">#d3d7df</color>
-    <color name="uplinkCarrierDishBack">#919cb0</color>
-    <color name="uplinkCarrierDishRing">@color/backgroundDataTypeCarrierUpHeader</color>
-    <color name="uplinkCarrierDishTip">#bdc4d0</color>
     <color name="uplinkCarrierSignalColor">@color/nasaRed</color>
 
-    <!--downlink carrier dish coloring -->
-    <color name="downlinkCarrierDishOutline">#666666</color>
-    <color name="downlinkCarrierDishBase">#d3d7df</color>
-    <color name="downlinkCarrierDishBack">#919cb0</color>
-    <color name="downlinkCarrierDishRing">@color/backgroundDataTypeCarrierDownHeader</color>
-    <color name="downlinkCarrierDishTip">#bdc4d0</color>
-    <color name="downlinkCarrierSignalColor">#3741d3</color>
-
-    <color name="nasaBlue">#0B3D91</color>
-    <color name="nasaRed">#FC3D21</color>
-    <color name="nasaRedMuted">#FC6C57</color>
+    <!-- Downlink data dish coloring -->
+    <color name="downlinkDataDishOutline">#666666</color>
+    <color name="downlinkDataDishBase">#D3D7DF</color>
+    <color name="downlinkDataDishBack">@color/backgroundDataTypeDataDownHeader</color>
+    <color name="downlinkDataDishRing">#E9EBEF</color>
+    <color name="downlinkDataDishTip">#BDC4D0</color>
+    <color name="downlinkDataSignalColor">#3741D3</color>
+    <color name="downlinkCarrierSignalColor">#3741D3</color>
 </resources>

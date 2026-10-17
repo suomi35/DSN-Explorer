@@ -1,17 +1,13 @@
 package com.holdenisacat.dsnexplorer.model
 
 data class Signal(
-
-    var active: Boolean,
-    var signalType: String,
-    var dataRate: String,
-    var frequency: String,
-    var band: String,
-    var power: String,
-    var spacecraft: String,
-    var spacecraftId: String,
-    var direction: SignalDirection
-
-    ) {
-    constructor() : this(false, "", "10", "", "", "", "", "", SignalDirection.UP)
-}
+    val active: Boolean = false,
+    val type: SignalType = SignalType.NONE,
+    val dataRate: String = "",
+    val frequency: String = "",
+    val band: String = "",
+    val power: String = "",
+    val spacecraft: String = "",
+    val spacecraftId: String = "",
+    val direction: SignalDirection = SignalDirection.UP,
+)

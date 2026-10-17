@@ -1,23 +1,38 @@
 package com.holdenisacat.dsnexplorer.model
 
-import com.holdenisacat.dsnexplorer.util.Constants
-import java.util.Locale
+import com.holdenisacat.dsnexplorer.util.DsnApi
+import com.holdenisacat.dsnexplorer.util.Formatters
+import com.holdenisacat.dsnexplorer.util.SiteFlags
 
 data class Spacecraft(
-
-    var name: String,
-    var explorerName: String,
-    var friendlyName: String,
-    var hasThumbnail: Boolean = false,
-    var id: String = "",
-    var uplegRange: Float = 0f,
-    var downlegRange: Float = 0f,
-    var roundtripLightTime: Float = 0f,
-    var flag: Int = 0,
-    var rangeIsEstimated: Boolean = false
+    val name: String,
+    val explorerName: String,
+    val friendlyName: String,
+    val hasThumbnail: Boolean = false,
+    val id: String = "",
+    val uplegRange: Float = UNKNOWN_RANGE,
+    val downlegRange: Float = UNKNOWN_RANGE,
+    val roundtripLightTime: Float = UNKNOWN_RANGE,
+    val siteName: String = "",
+    val rangeIsEstimated: Boolean = false,
 ) {
-    constructor() : this("", "", "")
+    /** Flag of the complex currently tracking this spacecraft, for display next to its name. */
+    val flagRes: Int
+        get() = SiteFlags.flagFor(siteName)
 
-    fun getImageUrl(): String =
-        "${Constants.SPACECRAFT_IMAGES_BASE_URL}${name.lowercase(Locale.ROOT)}.jpg"
+    /** Earth-spacecraft distance, marked with `~` when sourced from JPL Horizons. */
+    val formattedRange: String
+        get() = Formatters.distance(uplegRange, rangeIsEstimated)
+
+    /** Round-trip light time, marked with `~` when sourced from JPL Horizons. */
+    val formattedRoundtripLightTime: String
+        get() = Formatters.lightTime(roundtripLightTime, rangeIsEstimated)
+
+    fun imageUrl(): String =
+        "${DsnApi.SPACECRAFT_IMAGES_BASE_URL}${name.lowercase()}.jpg"
+
+    companion object {
+        /** Sentinel used by the DSN feed when a range or light-time value is unavailable. */
+        const val UNKNOWN_RANGE: Float = -1f
+    }
 }

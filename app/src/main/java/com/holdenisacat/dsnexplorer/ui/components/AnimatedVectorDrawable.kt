@@ -1,4 +1,4 @@
-package com.holdenisacat.dsnexplorer.ui.component
+package com.holdenisacat.dsnexplorer.ui.components
 
 import androidx.compose.animation.graphics.ExperimentalAnimationGraphicsApi
 import androidx.compose.animation.graphics.res.animatedVectorResource

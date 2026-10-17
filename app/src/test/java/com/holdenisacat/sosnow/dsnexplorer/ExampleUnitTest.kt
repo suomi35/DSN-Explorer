@@ -1,4 +1,4 @@
-package com.holdenisacat.dsnexplorer
+package com.holdenisacat.sosnow.dsnexplorer
 
 import org.junit.Test
 

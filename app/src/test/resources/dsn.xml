@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dsn>
+  <station name="mdscc" timeUTC="1735689600000" timeZoneOffset="3600000">
+    <dish name="DSS53" azimuthAngle="276" elevationAngle="35" windSpeed="9" isMSPA="false" isArray="false" isDDOR="false" activity="Spacecraft Telemetry, Tracking, and Command">
+      <upSignal active="true" signalType="data" dataRate="20000" frequency="8420031518" band="X" power="-499" spacecraft="m01o" spacecraftID="53"/>
+      <downSignal active="true" signalType="carrier" dataRate="5" frequency="8420031518" band="X" power="-100" spacecraft="m01o" spacecraftID="53"/>
+      <target name="M01O" uplegRange="173000000" downlegRange="173000000" rtlt="1190"/>
+    </dish>
+    <dish name="DSS54" azimuthAngle="180" elevationAngle="45" windSpeed="5" isMSPA="false" isArray="false" isDDOR="false" activity="Idle">
+      <upSignal active="false" signalType="none" dataRate="" frequency="" band="" power="" spacecraft="" spacecraftID=""/>
+      <downSignal active="false" signalType="none" dataRate="" frequency="" band="" power="" spacecraft="" spacecraftID=""/>
+    </dish>
+  </station>
+  <station name="gdscc" timeUTC="1735689600000" timeZoneOffset="-28800000">
+    <dish name="DSS26" azimuthAngle="90" elevationAngle="30" windSpeed="12" isMSPA="false" isArray="false" isDDOR="false" activity="Ranging">
+      <upSignal active="true" signalType="ranging" dataRate="" frequency="8497800000" band="S" power="" spacecraft="mvn" spacecraftID="202"/>
+      <downSignal active="true" signalType="data" dataRate="1000" frequency="8497800000" band="S" power="-899" spacecraft="mvn" spacecraftID="202"/>
+      <target name="MVN" uplegRange="-1" downlegRange="-1" rtlt="-1"/>
+    </dish>
+  </station>
+</dsn>
