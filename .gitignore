@@ -69,3 +69,6 @@ captures/
 
 # Keystore files
 *.jks
+
+# Ignore old screenshots reference dir
+screenshots-from-old/
