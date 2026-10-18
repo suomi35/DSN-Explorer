@@ -7,6 +7,7 @@ import com.holdenisacat.dsnexplorer.repository.DataRepository
 import com.holdenisacat.dsnexplorer.repository.HorizonsRangeClient
 import com.holdenisacat.dsnexplorer.repository.RangeSupplementer
 import com.holdenisacat.dsnexplorer.util.DsnExplorerPreferences
+import com.holdenisacat.dsnexplorer.util.PreferencesStore
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.okhttp.OkHttp
 import io.ktor.client.plugins.HttpRequestRetry
@@ -43,7 +44,7 @@ val appModule = module {
     single { RangeSupplementer(get()) }
     single { DataRepository(get(), get(), get(), get()) }
 
-    single { DsnExplorerPreferences(get()) }
+    single<PreferencesStore> { DsnExplorerPreferences(get()) }
 
     viewModel { MainViewModel(get(), get()) }
 }

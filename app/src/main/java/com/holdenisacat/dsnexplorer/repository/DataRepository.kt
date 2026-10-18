@@ -29,13 +29,13 @@ class DataRepository(
     private val configParser: ConfigXmlParser,
     private val dataParser: DataXmlParser,
     private val rangeSupplementer: RangeSupplementer,
-) {
+) : DsnRepository {
 
     private val _configuration = MutableStateFlow<Configuration?>(null)
     val configuration: StateFlow<Configuration?> = _configuration.asStateFlow()
 
     private val _dsn = MutableStateFlow<Dsn?>(null)
-    val dsn: StateFlow<Dsn?> = _dsn.asStateFlow()
+    override val dsn: StateFlow<Dsn?> = _dsn.asStateFlow()
 
     /**
      * Fetches configuration (on first call) plus live data and publishes the result.
@@ -43,7 +43,7 @@ class DataRepository(
      * @throws IOException on network or payload failures so callers can distinguish
      *   transport errors from an empty-but-valid feed.
      */
-    suspend fun refresh(): DataStatus = withContext(Dispatchers.IO) {
+    override suspend fun refresh(): DataStatus = withContext(Dispatchers.IO) {
         try {
             if (_configuration.value == null) {
                 fetchConfiguration()

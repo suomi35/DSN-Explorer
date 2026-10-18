@@ -7,8 +7,8 @@ import com.holdenisacat.dsnexplorer.model.Dish
 import com.holdenisacat.dsnexplorer.model.Dsn
 import com.holdenisacat.dsnexplorer.model.Mode
 import com.holdenisacat.dsnexplorer.model.Spacecraft
-import com.holdenisacat.dsnexplorer.repository.DataRepository
-import com.holdenisacat.dsnexplorer.util.DsnExplorerPreferences
+import com.holdenisacat.dsnexplorer.repository.DsnRepository
+import com.holdenisacat.dsnexplorer.util.PreferencesStore
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -28,8 +28,8 @@ import kotlinx.coroutines.launch
  * that only matters while visible.
  */
 class MainViewModel(
-    private val repository: DataRepository,
-    private val preferences: DsnExplorerPreferences,
+    private val repository: DsnRepository,
+    private val preferences: PreferencesStore,
 ) : ViewModel() {
 
     /** Top-level screen state: loading, loaded-with-data, or error. */
